@@ -19,12 +19,12 @@ var TRANSITION_DIRECTION_ENUM_IN   = ENUM; ENUM++;
 var TRANSITION_DIRECTION_ENUM_OUT  = ENUM; ENUM++;
 
 ENUM = 0;
-var DOMAIN_ENUM_NONE     = ENUM; ENUM++;
-var DOMAIN_ENUM_COLOR    = ENUM; ENUM++;
-var DOMAIN_ENUM_SPACIAL  = ENUM; ENUM++;
-var DOMAIN_ENUM_TEMPORAL = ENUM; ENUM++;
-var DOMAIN_ENUM_TAG      = ENUM; ENUM++;
-var DOMAIN_ENUM_COUNT    = ENUM; ENUM++;
+var VIZ_ENUM_NONE     = ENUM; ENUM++;
+var VIZ_ENUM_COLOR    = ENUM; ENUM++;
+var VIZ_ENUM_SPACIAL  = ENUM; ENUM++;
+var VIZ_ENUM_TEMPORAL = ENUM; ENUM++;
+var VIZ_ENUM_TAG      = ENUM; ENUM++;
+var VIZ_ENUM_COUNT    = ENUM; ENUM++;
 
 ENUM = 0;
 var TRANSITION_ENUM_NONE      = ENUM; ENUM++;
@@ -51,7 +51,7 @@ var domain = function()
   self.name = "";
   self.mutex = 1;
   self.directed = 0;
-  self.domain = DOMAIN_ENUM_NONE;
+  self.viz = VIZ_ENUM_NONE;
 }
 var ndomain = function()
 {

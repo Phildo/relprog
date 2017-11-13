@@ -25,6 +25,91 @@ var editor = function()
 }
 */
 
+var editable_text = function()
+{
+
+}
+
+var editable_toggle = function()
+{
+
+}
+
+var editable_viz = function()
+{
+
+}
+
+var editable_domain = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered = function(i) { }//overwrite
+  self.selected = function(i) { }//overwrite
+
+  self.properties = [];
+  self.properties.push(new editable_text());   //name
+  self.properties.push(new editable_toggle()); //mutex
+  self.properties.push(new editable_toggle()); //directed
+  self.properties.push(new editable_viz());    //viz
+
+  self.hover = function(evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(evt)
+  {
+    if(self.hovering_i == -1)
+      self.selected(self.hovering_i);
+  }
+
+  self.draw = function(title,domain,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText(title,editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+  }
+}
+
+var editable_group = function(editor)
+{
+  var self = this;
+}
+
+var editable_object = function(editor)
+{
+  var self = this;
+}
+
+
 var editable_list = function(editor)
 {
   var self = this;
@@ -111,68 +196,6 @@ var editable_list = function(editor)
 
 }
 
-var editable_domain = function(editor)
-{
-  var self = this;
-
-  self.hovering_i = 0;
-  self.selected_i = 0;
-
-  self.hovered = function(i) { }//overwrite
-  self.selected = function(i) { }//overwrite
-
-  self.hover = function(evt)
-  {
-    var old_hovering_i = self.hovering_i;
-    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
-    self.hovering_i = 0;
-
-    var off_y = 0;
-    var box_y;
-    box_y = editor.y+off_y;
-    if(
-      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
-      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
-    )
-      self.hovering_i = -1; //back btn
-    off_y += editor.selection_box_h;
-
-    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
-  }
-
-  self.click = function(evt)
-  {
-    if(self.hovering_i == -1)
-      self.selected(self.hovering_i);
-  }
-
-  self.draw = function(title,domain,ctx)
-  {
-    var off_y = 0;
-    var box_y;
-    box_y = editor.y+off_y;
-    if(self.hovering_i == -1)
-    {
-      var oldStyle = ctx.fillStyle;
-      ctx.fillStyle = editor.hover_bg_color;
-      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
-      ctx.fillStyle = oldStyle;
-    }
-    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
-    ctx.fillText(title,editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
-    off_y += editor.selection_box_h;
-  }
-}
-
-var editable_group = function(editor)
-{
-  var self = this;
-}
-
-var editable_object = function(editor)
-{
-  var self = this;
-}
 
 var content_editor = function(editor)
 {

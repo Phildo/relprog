@@ -60,13 +60,13 @@ var defaultState = function()
   d.name = "Space";
   d.mutex = 1;
   d.directed = 0;
-  d.domain = DOMAIN_ENUM_SPACIAL;
+  d.viz = VIZ_ENUM_SPACIAL;
 
   d = ndomain();
   d.name = "Time";
   d.mutex = 1;
   d.directed = 1;
-  d.domain = DOMAIN_ENUM_TEMPORAL;
+  d.viz = VIZ_ENUM_TEMPORAL;
 
   var c;
 
@@ -89,8 +89,8 @@ var calculateCacheState = function()
   temporal_domain = 0;
   for(var i = 0; i < domains.length; i++)
   {
-    if(domains[i].domain == DOMAIN_ENUM_SPACIAL)  spacial_domain  = i;
-    if(domains[i].domain == DOMAIN_ENUM_TEMPORAL) temporal_domain = i;
+    if(domains[i].viz == VIZ_ENUM_SPACIAL)  spacial_domain  = i;
+    if(domains[i].viz == VIZ_ENUM_TEMPORAL) temporal_domain = i;
   }
 
   t_breadth = 0;
