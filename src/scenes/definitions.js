@@ -1,11 +1,17 @@
 var ENUM;
 
 ENUM = 0;
-var CONTENT_ENUM_NONE   = ENUM; ENUM++;
-var CONTENT_ENUM_DOMAIN = ENUM; ENUM++;
-var CONTENT_ENUM_GROUP  = ENUM; ENUM++;
-var CONTENT_ENUM_OBJECT = ENUM; ENUM++;
-var CONTENT_ENUM_COUNT  = ENUM; ENUM++;
+var CONTENT_ENUM_NONE              = ENUM; ENUM++;
+var CONTENT_ENUM_DOMAIN            = ENUM; ENUM++;
+var CONTENT_ENUM_GROUP             = ENUM; ENUM++;
+var CONTENT_ENUM_OBJECT            = ENUM; ENUM++;
+var CONTENT_ENUM_ANNOTATION        = ENUM; ENUM++;
+var CONTENT_ENUM_GROUP_ANNOTATION  = ENUM; ENUM++;
+var CONTENT_ENUM_OBJECT_ANNOTATION = ENUM; ENUM++;
+var CONTENT_ENUM_GROUP_TRANSITION  = ENUM; ENUM++;
+var CONTENT_ENUM_OBJECT_TRANSITION = ENUM; ENUM++;
+var CONTENT_ENUM_CAMERA_TARGET     = ENUM; ENUM++;
+var CONTENT_ENUM_COUNT             = ENUM; ENUM++;
 
 ENUM = 0;
 var TRANSITION_DIRECTION_ENUM_NONE = ENUM; ENUM++;
@@ -89,18 +95,6 @@ var nobject = function()
   n.id = cur_object_id++;
   objects.push(n);
   return n;
-}
-
-var ncontent = function(c)
-{
-  var nc;
-  switch(c)
-  {
-    case CONTENT_ENUM_DOMAIN: nc = ndomain(); break;
-    case CONTENT_ENUM_GROUP:  nc = ngroup(); break;
-    case CONTENT_ENUM_OBJECT: nc = nobject(); break;
-  }
-  return nc;
 }
 
 var annotation = function()
