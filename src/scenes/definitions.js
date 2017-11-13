@@ -1,6 +1,13 @@
 var ENUM;
 
 ENUM = 0;
+var CONTENT_ENUM_NONE   = ENUM; ENUM++;
+var CONTENT_ENUM_DOMAIN = ENUM; ENUM++;
+var CONTENT_ENUM_GROUP  = ENUM; ENUM++;
+var CONTENT_ENUM_OBJECT = ENUM; ENUM++;
+var CONTENT_ENUM_COUNT  = ENUM; ENUM++;
+
+ENUM = 0;
 var TRANSITION_DIRECTION_ENUM_NONE = ENUM; ENUM++;
 var TRANSITION_DIRECTION_ENUM_IN   = ENUM; ENUM++;
 var TRANSITION_DIRECTION_ENUM_OUT  = ENUM; ENUM++;
@@ -44,6 +51,7 @@ var ndomain = function()
 {
   var n = new domain();
   n.id = cur_domain_id++;
+  domains.push(n);
   return n;
 }
 
@@ -63,6 +71,7 @@ var ngroup = function()
 {
   var n = new group();
   n.id = cur_group_id++;
+  groups.push(n);
   return n;
 }
 
@@ -78,7 +87,20 @@ var nobject = function()
 {
   var n = new object();
   n.id = cur_object_id++;
+  objects.push(n);
   return n;
+}
+
+var ncontent = function(c)
+{
+  var nc;
+  switch(c)
+  {
+    case CONTENT_ENUM_DOMAIN: nc = ndomain(); break;
+    case CONTENT_ENUM_GROUP:  nc = ngroup(); break;
+    case CONTENT_ENUM_OBJECT: nc = nobject(); break;
+  }
+  return nc;
 }
 
 var annotation = function()
@@ -94,6 +116,7 @@ var nannotation = function()
 {
   var n = new annotation();
   n.id = cur_annotation_id++;
+  annotations.push(n);
   return n;
 }
 
@@ -111,6 +134,7 @@ var ngroup_annotation = function()
 {
   var n = new group_annotation();
   n.id = cur_group_annotation_id++;
+  group_annotations.push(n);
   return n;
 }
 
@@ -128,6 +152,7 @@ var nobject_annotation = function()
 {
   var n = new object_annotation();
   n.id = cur_object_annotation_id++;
+  object_annotations.push(n);
   return n;
 }
 
@@ -145,6 +170,7 @@ var ngroup_transition = function()
 {
   var n = new group_transition();
   n.id = cur_group_transition_id++;
+  group_transitions.push(n);
   return n;
 }
 
@@ -163,6 +189,7 @@ var nobject_transition = function()
 {
   var n = new object_transition();
   n.id = cur_object_transition_id++;
+  object_transitions.push(n);
   return n;
 }
 
@@ -182,6 +209,7 @@ var ncamera_target = function()
 {
   var n = new camera_target();
   n.id = cur_camera_target_id++;
+  camera_targets.push(n);
   return n;
 }
 

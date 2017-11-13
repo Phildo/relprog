@@ -30,10 +30,16 @@ var MainScene = function(doodle, stage)
     if(clicker) clicker.detach();
     hoverer = new PersistentHoverer({source:canvas});
     clicker = new Clicker({source:canvas});
+
+    c_editor.w = 200;
+    c_editor.h = canv.height;;
+    c_editor.x = canv.width-c_editor.w;
+    c_editor.y = 0;
   }
 
   self.ready = function()
   {
+    defaultState();
     c_editor = new content_editor();
 
     self.resize(stage);
@@ -49,7 +55,7 @@ var MainScene = function(doodle, stage)
 
   self.draw = function()
   {
-    c_editor.draw();
+    c_editor.draw(ctx);
   };
 
   self.cleanup = function()

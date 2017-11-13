@@ -113,6 +113,8 @@ function mapRect(from,to,rect)
 }
 
 //collide (raw)
+var fWithin = function(min,max,f) { return (f >= min && f <= max); }
+var fNear = function(n,r,f) { var d = n-f;  return d*d < r*r; }
 var ptWithin = function(x,y,w,h,ptx,pty) { return (ptx >= x && ptx <= x+w && pty >= y && pty <= y+h); }
 var ptNear = function(x,y,r,ptx,pty) { var dx = ptx-x; var dy = pty-y; return (dx*dx+dy*dy) < r*r; }
 var rectCollide = function(ax,ay,aw,ah,bx,by,bw,bh) { return ax < bx+bw && bx < ax+aw && ay < by+bh && by < ay+ah; }

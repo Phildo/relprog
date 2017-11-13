@@ -1,22 +1,12 @@
-var domains;
-var groups;
-var objects;
-var annotations;
-var group_annotations;
-var object_annotations;
-var group_transitions;
-var object_transitions;
-var camera_targets;
-
-var cur_domain_id;
-var cur_group_id;
-var cur_object_id;
-var cur_annotation_id;
-var cur_group_annotation_id;
-var cur_object_annotation_id;
-var cur_group_transition_id;
-var cur_object_transition_id;
-var cur_camera_target_id;
+var domains;            var cur_domain_id;
+var groups;             var cur_group_id;
+var objects;            var cur_object_id;
+var annotations;        var cur_annotation_id;
+var group_annotations;  var cur_group_annotation_id;
+var object_annotations; var cur_object_annotation_id;
+var group_transitions;  var cur_group_transition_id;
+var object_transitions; var cur_object_transition_id;
+var camera_targets;     var cur_camera_target_id;
 
 //cache state
 var spacial_domain;
@@ -33,6 +23,8 @@ var temporal_min;
 var temporal_max;
 var temporal_breadth;
 
+var content_lists;
+
 var resetState = function()
 {
   cur_domain_id            = 0;
@@ -45,15 +37,15 @@ var resetState = function()
   cur_object_transition_id = 0;
   cur_camera_target_id     = 0;
 
-  domains            = [ndomain()];
-  groups             = [ngroup()];
-  objects            = [nobject()];
-  annotations        = [nannotation()];
-  group_annotations  = [ngroup_annotation()];
-  object_annotations = [nobject_annotation()];
-  group_transitions  = [ngroup_transition()];
-  object_transitions = [nobject_transition()];
-  camera_targets     = [ncamera_target()];
+  domains            = []; ndomain();
+  groups             = []; ngroup();
+  objects            = []; nobject();
+  annotations        = []; nannotation();
+  group_annotations  = []; ngroup_annotation();
+  object_annotations = []; nobject_annotation();
+  group_transitions  = []; ngroup_transition();
+  object_transitions = []; nobject_transition();
+  camera_targets     = []; ncamera_target();
 
   calculateCacheState();
 }
@@ -65,18 +57,16 @@ var defaultState = function()
   var d;
 
   d = ndomain();
-  d.name = "Time";
-  d.mutex = 1;
-  d.directed = 1;
-  d.viz_type = VIZ_TYPE_TIMELINE;
-  domains.push(d);
-
-  d = ndomain();
   d.name = "Space";
   d.mutex = 1;
   d.directed = 0;
-  d.viz_type = VIZ_TYPE_SPACIAL;
-  domains.push(d);
+  d.domain = DOMAIN_ENUM_SPACIAL;
+
+  d = ndomain();
+  d.name = "Time";
+  d.mutex = 1;
+  d.directed = 1;
+  d.domain = DOMAIN_ENUM_TEMPORAL;
 
   var c;
 
@@ -84,13 +74,17 @@ var defaultState = function()
   c.t = 1;
   c.target = TARGET_ENUM_ASPECT_FIT;
   c.transition = TRANSITION_ENUM_POP;
-  camera_targets.push(c);
 
   calculateCacheState();
 }
 
 var calculateCacheState = function()
 {
+  content_lists = [];
+  content_lists[CONTENT_ENUM_DOMAIN] = domains;
+  content_lists[CONTENT_ENUM_GROUP]  = groups;
+  content_lists[CONTENT_ENUM_OBJECT] = objects;
+
   spacial_domain  = 0;
   temporal_domain = 0;
   for(var i = 0; i < domains.length; i++)
