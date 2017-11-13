@@ -15,7 +15,7 @@ body,div
 <script type='text/javascript' src='src/utils/webgl-utils.js'></script>
 <script type="text/javascript" src="src/canv.js"></script>
 <script type="text/javascript" src="src/stage.js"></script>
-<script type="text/javascript" src="src/game.js"></script>
+<script type="text/javascript" src="src/doodle.js"></script>
 <script type="text/javascript" src="src/dom.js"></script>
 
 <script type="text/javascript" src="src/scenes/definitions.js"></script>
@@ -30,7 +30,7 @@ body,div
 <script type="text/javascript" src="src/doqueues/drawer.js"></script>
 <script type="text/javascript" src="src/doqueues/flicker.js"></script>
 <script type="text/javascript" src="src/dofilters/hoverer.js"></script>
-<script type="text/javascript" src="src/doqueues/persistent_hoverer.js"></script>
+<script type="text/javascript" src="src/dofilters/persistent_hoverer.js"></script>
 <script type="text/javascript" src="src/doqueues/presser.js"></script>
 <script type="text/javascript" src="src/doqueues/ticker.js"></script>
 <script type="text/javascript" src="src/doqueues/particler.js"></script>
@@ -42,15 +42,15 @@ body,div
 <script type="text/javascript" src="src/scenes/nullScene.js"></script>
 <script type="text/javascript" src="src/scenes/loadingScene.js"></script>
 <script type="text/javascript" src="src/scenes/testScene.js"></script>
-<script type="text/javascript" src="src/scenes/gameplayScene.js"></script>
+<script type="text/javascript" src="src/scenes/mainScene.js"></script>
 
 <script type="text/javascript">
-var g;
+var d;
 function resize()
 {
   var w = window.innerWidth;
   var h = window.innerHeight;
-  if(g) g.resize({width:w,height:h});
+  if(d) d.resize({width:w,height:h});
 }
 function begin()
 {
@@ -58,8 +58,8 @@ function begin()
   var h = window.innerHeight;
   document.getElementsByTagName("body")[0].scroll = "no";
 
-  g = new Game({width:w,height:h,container:"stage_container"});
-  g.begin();
+  d = new Doodle({width:w,height:h,container:"stage_container"});
+  d.begin();
 }
 window.addEventListener("touchstart", function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 window.addEventListener("load",begin,false);

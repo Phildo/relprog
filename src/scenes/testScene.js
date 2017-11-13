@@ -1,4 +1,4 @@
-var TestScene = function(game, stage)
+var TestScene = function(doodle, stage)
 {
   var self = this;
 

@@ -1,4 +1,4 @@
-var LoadingScene = function(game, stage)
+var LoadingScene = function(doodle, stage)
 {
   var self = this;
 
@@ -127,7 +127,7 @@ var LoadingScene = function(game, stage)
     if(ticks_since_ready >= post_load_countdown)
     {
       //any last minute preparation
-      game.nextScene();
+      doodle.nextScene();
     }
   };
 

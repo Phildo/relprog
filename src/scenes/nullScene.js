@@ -1,4 +1,4 @@
-var NullScene = function(game, stage)
+var NullScene = function(doodle, stage)
 {
   var self = this;
 
