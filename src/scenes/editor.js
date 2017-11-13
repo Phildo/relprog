@@ -27,17 +27,17 @@ var editor = function()
 
 var editable_text = function()
 {
-
+  var self = this;
 }
 
 var editable_toggle = function()
 {
-
+  var self = this;
 }
 
 var editable_viz = function()
 {
-
+  var self = this;
 }
 
 var editable_domain = function(editor)
@@ -56,7 +56,7 @@ var editable_domain = function(editor)
   self.properties.push(new editable_toggle()); //directed
   self.properties.push(new editable_viz());    //viz
 
-  self.hover = function(evt)
+  self.hover = function(domain,evt)
   {
     var old_hovering_i = self.hovering_i;
     // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
@@ -75,13 +75,13 @@ var editable_domain = function(editor)
     if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
   }
 
-  self.click = function(evt)
+  self.click = function(domain,evt)
   {
     if(self.hovering_i == -1)
       self.selected(self.hovering_i);
   }
 
-  self.draw = function(title,domain,ctx)
+  self.draw = function(domain,ctx)
   {
     var off_y = 0;
     var box_y;
@@ -94,7 +94,7 @@ var editable_domain = function(editor)
       ctx.fillStyle = oldStyle;
     }
     drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
-    ctx.fillText(title,editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    ctx.fillText("Domain ("+domain.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
     off_y += editor.selection_box_h;
   }
 }
@@ -231,12 +231,7 @@ var content_editor = function(editor)
     self.cur_selected_i = i;
     self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
 
-    switch(self.edit_type)
-    {
-      case CONTENT_ENUM_DOMAIN: self.cur_title = "Domain ("+domains[self.cur_selected_i].name+"):"; break;
-      case CONTENT_ENUM_GROUP:  self.cur_title = "Group ("+  groups[self.cur_selected_i].name+"):"; break;
-      case CONTENT_ENUM_OBJECT: self.cur_title = "Object ("+objects[self.cur_selected_i].name+"):"; break;
-    }
+    self.cur_title = "";
     self.cur_list = 0;
 
     self.editable_list.selected_i = 0;
@@ -311,7 +306,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.hover(evt); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_domain.hover(domains[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_GROUP:  self.editable_group.hover(groups[  self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_OBJECT: self.editable_object.hover(objects[self.cur_selected_i],evt); break;
         }
         break;
     }
@@ -330,7 +327,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.click(evt); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_domain.click(domains[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_GROUP:  self.editable_group.click(groups[  self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_OBJECT: self.editable_object.click(objects[self.cur_selected_i],evt); break;
         }
         break;
     }
@@ -351,7 +350,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.draw(self.cur_title,self.cur_domain,ctx); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_domain.draw(domains[self.cur_selected_i],ctx); break;
+          case CONTENT_ENUM_GROUP:  self.editable_group.draw(groups[  self.cur_selected_i],ctx); break;
+          case CONTENT_ENUM_OBJECT: self.editable_object.draw(objects[self.cur_selected_i],ctx); break;
         }
         break;
     }
