@@ -35,6 +35,8 @@ var content_editor = function()
   self.font_face = "Helvetica";
   self.hover_bg_color = "#AAAAAA";
 
+  self.back_btn_w = 30;
+
   self.selection_box_text_off_x = 5;
   self.selection_box_text_off_y = self.font_size;
   self.selection_box_h = self.font_size+5;
@@ -77,14 +79,27 @@ var content_editor = function()
         break;
 
       case EDIT_MODE_ENUM_INDIVIDUAL:
+
+        // if(!fWithin(self.x,self.x+self.w,evt.doX)) return; //commented out because should be assumed
+        self.hovering_i = 0;
+
+        var list = content_lists[self.edit_type];
+        var off_y = 0;
+        var box_y;
+        box_y = self.y+off_y;
+        if(
+          fWithin(box_y,box_y+self.selection_box_h,evt.doY) &&
+          fWithin(self.x,self.x+self.back_btn_w,evt.doX)
+        )
+          self.hovering_i = -1; //back btn
+        off_y += self.selection_box_h;
+
+        break;
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN:
-            break;
-          case CONTENT_ENUM_GROUP:
-            break;
-          case CONTENT_ENUM_OBJECT:
-            break;
+          case CONTENT_ENUM_DOMAIN: break;
+          case CONTENT_ENUM_GROUP: break;
+          case CONTENT_ENUM_OBJECT: break;
         }
         break;
     }
@@ -108,6 +123,14 @@ var content_editor = function()
           self.selected_i = self.hovering_i;
           self.hovering_i = 0;
           self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
+        }
+        break;
+      case EDIT_MODE_ENUM_INDIVIDUAL:
+        if(self.hovering_i == -1) //back btn
+        {
+          self.hovering_i = 0;
+          self.selected_i = 0;
+          self.edit_mode = EDIT_MODE_ENUM_LIST;
         }
         break;
     }
@@ -177,8 +200,15 @@ var content_editor = function()
           case CONTENT_ENUM_OBJECT: title = "Object ("+list[self.selected_i].name+"):"; break;
         }
         box_y = self.y+off_y;
+        if(self.hovering_i == -1)
+        {
+          var oldStyle = ctx.fillStyle;
+          ctx.fillStyle = self.hover_bg_color;
+          ctx.fillRect(self.x,box_y,self.back_btn_w,self.selection_box_h);
+          ctx.fillStyle = oldStyle;
+        }
         drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
-        ctx.fillText(title,self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+        ctx.fillText(title,self.x+self.back_btn_w+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
         off_y += self.selection_box_h;
 
         switch(self.edit_type)
