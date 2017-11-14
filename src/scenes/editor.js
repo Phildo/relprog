@@ -213,11 +213,249 @@ var editable_domain = function(editor)
 var editable_group = function(editor)
 {
   var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.group = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_group = function(group)
+  {
+    self.group = group;
+    self.name_editor.set_val(  self.group.name);
+    self.domain_editor.set_val(self.group.domain);
+    self.seq_editor.set_val(   self.group.seq);
+    self.color_editor.set_val( self.group.color);
+    self.img_editor.set_val(   self.group.img);
+    self.wx_editor.set_val(    self.group.wx);
+    self.wy_editor.set_val(    self.group.wy);
+  }
+
+  self.name_editor           = new editable_text(editor);
+  self.name_editor.changed   = function() { self.group.name   = self.name_editor.val;     };
+  self.domain_editor         = new editable_text(editor);
+  self.domain_editor.changed = function() { self.group.domain = self.domain_editor.val;    };
+  self.seq_editor            = new editable_text(editor);
+  self.seq_editor.changed    = function() { self.group.seq    = self.seq_editor.val;    };
+  self.color_editor          = new editable_text(editor);
+  self.color_editor.changed  = function() { self.group.color  = self.color_editor.val;    };
+  self.img_editor            = new editable_text(editor);
+  self.img_editor.changed    = function() { self.group.img    = self.img_editor.val;    };
+  self.wx_editor             = new editable_text(editor);
+  self.wx_editor.changed     = function() { self.group.wx     = self.wx_editor.val;    };
+  self.wy_editor             = new editable_text(editor);
+  self.wy_editor.changed     = function() { self.group.wy     = self.wy_editor.val;    };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.domain_editor);
+  self.properties.push(self.seq_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+  self.properties.push(self.wx_editor);
+  self.properties.push(self.wy_editor);
+
+  self.hover = function(group,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(group,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(group,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("group ("+group.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
 }
 
 var editable_object = function(editor)
 {
   var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.object = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_object = function(object)
+  {
+    self.object = object;
+    self.name_editor.set_val( self.object.name);
+    self.color_editor.set_val(self.object.color);
+    self.img_editor.set_val(  self.object.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.name_editor.changed  = function() { self.object.name  = self.name_editor.val;  };
+  self.color_editor         = new editable_text(editor);
+  self.color_editor.changed = function() { self.object.color = self.color_editor.val; };
+  self.img_editor           = new editable_text(editor);
+  self.img_editor.changed   = function() { self.object.img   = self.img_editor.val;   };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(object,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(object,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(object,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("object ("+object.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
 }
 
 var editable_list = function(editor)
