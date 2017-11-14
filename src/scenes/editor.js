@@ -90,6 +90,45 @@ var editable_text = function(editor)
 
 }
 
+var editable_toggle = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = 0;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = self.val;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+  }
+
+  self.deactivate = function()
+  {
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+    self.set_val(self.val ? 0 : 1);
+    self.changed();
+  }
+
+}
+
 var editable_domain = function(editor)
 {
   var self = this;
@@ -112,7 +151,7 @@ var editable_domain = function(editor)
 
   self.name_editor             = new editable_text(editor);
   self.name_editor.changed     = function() { self.domain.name     = self.name_editor.val;     };
-  self.mutex_editor            = new editable_text(editor);
+  self.mutex_editor            = new editable_toggle(editor);
   self.mutex_editor.changed    = function() { self.domain.mutex    = self.mutex_editor.val;    };
   self.directed_editor         = new editable_text(editor);
   self.directed_editor.changed = function() { self.domain.directed = self.directed_editor.val; };
@@ -663,6 +702,7 @@ var content_editor = function(editor)
 
       self.editable_domain.hovering_i = 0;
       self.editable_domain.selected_i = 0;
+      self.editable_list.hovering_i = -1;
     }
   };
 
@@ -675,6 +715,10 @@ var content_editor = function(editor)
       self.cur_selected_i = 0;
       self.edit_mode = EDIT_MODE_ENUM_LIST;
       self.cur_title = "Groups:";
+
+      self.editable_group.hovering_i = 0;
+      self.editable_group.selected_i = 0;
+      self.editable_list.hovering_i = -1;
     }
   };
 
@@ -687,6 +731,10 @@ var content_editor = function(editor)
       self.cur_selected_i = 0;
       self.edit_mode = EDIT_MODE_ENUM_LIST;
       self.cur_title = "Objects:";
+
+      self.editable_object.hovering_i = 0;
+      self.editable_object.selected_i = 0;
+      self.editable_list.hovering_i = -1;
     }
   };
 
