@@ -30,7 +30,7 @@ var init_dom = function()
   dom_toggle.onchange = function(){dom_toggle_callback();};
   dom_parent.appendChild(dom_toggle);
 
-  dom_drop = document.createElement("input");
+  dom_drop = document.createElement("select");
   dom_drop.style.display = "none";
   dom_drop.style.position = "absolute";
   dom_drop.style.left = "0px";
@@ -51,8 +51,203 @@ var editable_text = function(editor)
   self.listen_change = function()
   {
     var old_val = self.val;
-    self.val = dom_text.value;
+    self.set_val(dom_text.value);
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
     self.text = self.val;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_text.value = self.val;
+    dom_text.style.display = "block";
+    dom_text.style.left = editor.x+off_x+"px";
+    dom_text.style.top  = editor.y+off_y+"px";
+    dom_text_callback = self.listen_change;
+    dom_text.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_text.style.display = "none";
+    dom_text.value = "";
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_int = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = "";
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(dom_text.value);
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = self.val;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_text.value = self.val;
+    dom_text.style.display = "block";
+    dom_text.style.left = editor.x+off_x+"px";
+    dom_text.style.top  = editor.y+off_y+"px";
+    dom_text_callback = self.listen_change;
+    dom_text.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_text.style.display = "none";
+    dom_text.value = "";
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_float = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = "";
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(dom_text.value);
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = self.val;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_text.value = self.val;
+    dom_text.style.display = "block";
+    dom_text.style.left = editor.x+off_x+"px";
+    dom_text.style.top  = editor.y+off_y+"px";
+    dom_text_callback = self.listen_change;
+    dom_text.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_text.style.display = "none";
+    dom_text.value = "";
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_color = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = "";
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(dom_text.value);
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = self.val;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_text.value = self.val;
+    dom_text.style.display = "block";
+    dom_text.style.left = editor.x+off_x+"px";
+    dom_text.style.top  = editor.y+off_y+"px";
+    dom_text_callback = self.listen_change;
+    dom_text.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_text.style.display = "none";
+    dom_text.value = "";
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_img = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = "";
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(dom_text.value);
     if(self.val != old_val) self.changed();
   }
 
@@ -129,6 +324,123 @@ var editable_toggle = function(editor)
 
 }
 
+var selectable_viz = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = VIZ_ENUM_NONE;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = "";
+    switch(self.val)
+    {
+      case VIZ_ENUM_COLOR:    self.text = "Color";    break;
+      case VIZ_ENUM_SPACIAL:  self.text = "Spacial";  break;
+      case VIZ_ENUM_TEMPORAL: self.text = "Temporal"; break;
+      case VIZ_ENUM_TAG:      self.text = "Tag";      break;
+    }
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_drop.innerHTML =
+    "<option value=\""+VIZ_ENUM_COLOR   +"\">Color</option>"+
+    "<option value=\""+VIZ_ENUM_SPACIAL +"\">Spacial</option>"+
+    "<option value=\""+VIZ_ENUM_TEMPORAL+"\">Temporal</option>"+
+    "<option value=\""+VIZ_ENUM_TAG     +"\">Tag</option>"
+    ;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var selectable_domain = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = 0;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = domains[self.val].name;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    var html = "";
+    console.log(domains);
+    for(var i = 1; i < domains.length; i++)
+      html += "<option value=\""+i+"\">"+domains[i].name+"</option>";
+    console.log(html);
+    dom_drop.innerHTML = html;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
 var editable_domain = function(editor)
 {
   var self = this;
@@ -153,9 +465,9 @@ var editable_domain = function(editor)
   self.name_editor.changed     = function() { self.domain.name     = self.name_editor.val;     };
   self.mutex_editor            = new editable_toggle(editor);
   self.mutex_editor.changed    = function() { self.domain.mutex    = self.mutex_editor.val;    };
-  self.directed_editor         = new editable_text(editor);
+  self.directed_editor         = new editable_toggle(editor);
   self.directed_editor.changed = function() { self.domain.directed = self.directed_editor.val; };
-  self.viz_editor              = new editable_text(editor);
+  self.viz_editor              = new selectable_viz(editor);
   self.viz_editor.changed      = function() { self.domain.viz      = self.viz_editor.val;      };
 
   self.properties = [];
@@ -274,17 +586,17 @@ var editable_group = function(editor)
 
   self.name_editor           = new editable_text(editor);
   self.name_editor.changed   = function() { self.group.name   = self.name_editor.val;     };
-  self.domain_editor         = new editable_text(editor);
+  self.domain_editor         = new selectable_domain(editor);
   self.domain_editor.changed = function() { self.group.domain = self.domain_editor.val;    };
-  self.seq_editor            = new editable_text(editor);
+  self.seq_editor            = new editable_int(editor);
   self.seq_editor.changed    = function() { self.group.seq    = self.seq_editor.val;    };
-  self.color_editor          = new editable_text(editor);
+  self.color_editor          = new editable_color(editor);
   self.color_editor.changed  = function() { self.group.color  = self.color_editor.val;    };
-  self.img_editor            = new editable_text(editor);
+  self.img_editor            = new editable_img(editor);
   self.img_editor.changed    = function() { self.group.img    = self.img_editor.val;    };
-  self.wx_editor             = new editable_text(editor);
+  self.wx_editor             = new editable_float(editor);
   self.wx_editor.changed     = function() { self.group.wx     = self.wx_editor.val;    };
-  self.wy_editor             = new editable_text(editor);
+  self.wy_editor             = new editable_float(editor);
   self.wy_editor.changed     = function() { self.group.wy     = self.wy_editor.val;    };
 
   self.properties = [];
@@ -402,9 +714,9 @@ var editable_object = function(editor)
 
   self.name_editor          = new editable_text(editor);
   self.name_editor.changed  = function() { self.object.name  = self.name_editor.val;  };
-  self.color_editor         = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
   self.color_editor.changed = function() { self.object.color = self.color_editor.val; };
-  self.img_editor           = new editable_text(editor);
+  self.img_editor           = new editable_img(editor);
   self.img_editor.changed   = function() { self.object.img   = self.img_editor.val;   };
 
   self.properties = [];
