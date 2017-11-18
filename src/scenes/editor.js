@@ -978,18 +978,6 @@ var content_editor = function(editor)
           case 3: self.edit_type = CONTENT_ENUM_OBJECT; self.cur_title = "Objects:"; break;
         }
       }
-      else if(del)
-      {
-        var list;
-        var del;
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_DOMAIN: list = domains; del = ddomain; break;
-          case CONTENT_ENUM_GROUP:  list = groups;  del = dgroup;  break;
-          case CONTENT_ENUM_OBJECT: list = objects; del = dobject; break;
-        }
-        del(list[i]);
-      }
       else
       {
         var list;
@@ -998,18 +986,23 @@ var content_editor = function(editor)
         var edset;
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: list = domains; gen = ndomain; editor = self.editable_domain; edset = self.editable_domain.set_domain; break;
-          case CONTENT_ENUM_GROUP:  list = groups;  gen = ngroup;  editor = self.editable_group;  edset = self.editable_group.set_group;   break;
-          case CONTENT_ENUM_OBJECT: list = objects; gen = nobject; editor = self.editable_object; edset = self.editable_object.set_object; break;
+          case CONTENT_ENUM_DOMAIN: list = domains; gen = ndomain; if(del) del = ddomain; editor = self.editable_domain; edset = self.editable_domain.set_domain; break;
+          case CONTENT_ENUM_GROUP:  list = groups;  gen = ngroup;  if(del) del = dgroup;  editor = self.editable_group;  edset = self.editable_group.set_group;   break;
+          case CONTENT_ENUM_OBJECT: list = objects; gen = nobject; if(del) del = dobject; editor = self.editable_object; edset = self.editable_object.set_object; break;
         }
-        var is_new = 0;
-        if(i == list.length) { gen(); is_new = 1; }
-        self.cur_selected_i = i;
-        self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
-        edset(list[self.cur_selected_i]);
-        if(is_new) editor.name_editor.activate(0,self.selection_box_h);
 
-        self.cur_title = "";
+        var is_new = 0;
+        if(del && i != list.length) del(list[i]);
+        else
+        {
+          if(i == list.length) { gen(); is_new = 1; }
+          self.cur_selected_i = i;
+          self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
+          edset(list[self.cur_selected_i]);
+          if(is_new) editor.name_editor.activate(0,self.selection_box_h);
+
+          self.cur_title = "";
+        }
       }
     }
 
