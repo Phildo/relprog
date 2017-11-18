@@ -53,13 +53,6 @@ var domain = function()
   self.directed = 0;
   self.viz = VIZ_ENUM_NONE;
 }
-var ndomain = function()
-{
-  var n = new domain();
-  n.id = cur_domain_id++;
-  domains.push(n);
-  return n;
-}
 
 var group = function()
 {
@@ -73,13 +66,6 @@ var group = function()
   self.wx = 0;
   self.wy = 0;
 }
-var ngroup = function()
-{
-  var n = new group();
-  n.id = cur_group_id++;
-  groups.push(n);
-  return n;
-}
 
 var object = function()
 {
@@ -88,13 +74,6 @@ var object = function()
   self.name = "";
   self.color = 0;
   self.img = 0;
-}
-var nobject = function()
-{
-  var n = new object();
-  n.id = cur_object_id++;
-  objects.push(n);
-  return n;
 }
 
 var annotation = function()
@@ -105,13 +84,6 @@ var annotation = function()
   self.t = 0;
   self.color = 0;
   self.img = 0;
-}
-var nannotation = function()
-{
-  var n = new annotation();
-  n.id = cur_annotation_id++;
-  annotations.push(n);
-  return n;
 }
 
 var group_annotation = function()
@@ -124,13 +96,6 @@ var group_annotation = function()
   self.color = 0;
   self.img = 0;
 }
-var ngroup_annotation = function()
-{
-  var n = new group_annotation();
-  n.id = cur_group_annotation_id++;
-  group_annotations.push(n);
-  return n;
-}
 
 var object_annotation = function()
 {
@@ -142,13 +107,6 @@ var object_annotation = function()
   self.color = 0;
   self.img = 0;
 }
-var nobject_annotation = function()
-{
-  var n = new object_annotation();
-  n.id = cur_object_annotation_id++;
-  object_annotations.push(n);
-  return n;
-}
 
 var group_transition = function()
 {
@@ -159,13 +117,6 @@ var group_transition = function()
   self.name = "";
   self.t = 0;
   self.transition = TRANSITION_ENUM_NONE;
-}
-var ngroup_transition = function()
-{
-  var n = new group_transition();
-  n.id = cur_group_transition_id++;
-  group_transitions.push(n);
-  return n;
 }
 
 var object_transition = function()
@@ -179,13 +130,6 @@ var object_transition = function()
   self.t = 0;
   self.transition = TRANSITION_ENUM_NONE;
 }
-var nobject_transition = function()
-{
-  var n = new object_transition();
-  n.id = cur_object_transition_id++;
-  object_transitions.push(n);
-  return n;
-}
 
 var camera_target = function()
 {
@@ -198,19 +142,5 @@ var camera_target = function()
   self.t = 0;
   self.target = TARGET_ENUM_NONE;
   self.transition = TRANSITION_ENUM_NONE;
-}
-var ncamera_target = function()
-{
-  var n = new camera_target();
-  n.id = cur_camera_target_id++;
-  camera_targets.push(n);
-  return n;
-}
-
-var byId = function(list,id)
-{
-  for(var i = 1; i < list.length; i++)
-    if(list[i].id == id) return list[i];
-  return list[0];
 }
 

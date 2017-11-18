@@ -410,10 +410,8 @@ var selectable_domain = function(editor)
   self.activate = function(off_x,off_y)
   {
     var html = "";
-    console.log(domains);
     for(var i = 1; i < domains.length; i++)
       html += "<option value=\""+i+"\">"+domains[i].name+"</option>";
-    console.log(html);
     dom_drop.innerHTML = html;
     dom_drop.value = self.val;
     dom_drop.style.display = "block";
