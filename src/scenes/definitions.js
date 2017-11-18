@@ -52,6 +52,7 @@ var domain = function()
   self.mutex = 1;
   self.directed = 0;
   self.viz = VIZ_ENUM_NONE;
+  self.valid = 0;
 }
 
 var group = function()
@@ -65,6 +66,7 @@ var group = function()
   self.img = 0;
   self.wx = 0;
   self.wy = 0;
+  self.valid = 0;
 }
 
 var object = function()
@@ -74,6 +76,7 @@ var object = function()
   self.name = "";
   self.color = 0;
   self.img = 0;
+  self.valid = 0;
 }
 
 var annotation = function()
@@ -84,6 +87,7 @@ var annotation = function()
   self.t = 0;
   self.color = 0;
   self.img = 0;
+  self.valid = 0;
 }
 
 var group_annotation = function()
@@ -95,6 +99,7 @@ var group_annotation = function()
   self.t = 0;
   self.color = 0;
   self.img = 0;
+  self.valid = 0;
 }
 
 var object_annotation = function()
@@ -106,6 +111,7 @@ var object_annotation = function()
   self.t = 0;
   self.color = 0;
   self.img = 0;
+  self.valid = 0;
 }
 
 var group_transition = function()
@@ -117,6 +123,7 @@ var group_transition = function()
   self.name = "";
   self.t = 0;
   self.transition = TRANSITION_ENUM_NONE;
+  self.valid = 0;
 }
 
 var object_transition = function()
@@ -129,6 +136,7 @@ var object_transition = function()
   self.name = "";
   self.t = 0;
   self.transition = TRANSITION_ENUM_NONE;
+  self.valid = 0;
 }
 
 var camera_target = function()
@@ -142,5 +150,6 @@ var camera_target = function()
   self.t = 0;
   self.target = TARGET_ENUM_NONE;
   self.transition = TRANSITION_ENUM_NONE;
+  self.valid = 0;
 }
 
