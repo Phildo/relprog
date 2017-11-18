@@ -813,15 +813,18 @@ var editable_list = function(editor)
 
   self.hovering_i = 0;
   self.selected_i = 0;
+  self.delete_mod = 0;
 
-  self.hovered = function(i) { }//overwrite
-  self.selected = function(i) { }//overwrite
+  self.hovered = function(i,del) { }//overwrite
+  self.selected = function(i,del) { }//overwrite
 
-  self.hover = function(list,back,add,evt)
+  self.hover = function(list,back,add,del,evt)
   {
     var old_hovering_i = self.hovering_i;
-    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
     self.hovering_i = 0;
+    self.delete_mod = 0;
+    if(del && fWithin(editor.x+editor.w-editor.selection_box_h,editor.x+editor.w,evt.doX))
+      self.delete_mod = 1;
 
     var off_y = 0;
     var box_y;
@@ -850,7 +853,7 @@ var editable_list = function(editor)
       off_y += editor.selection_box_h;
     }
 
-    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i,self.delete_mod);
   }
 
   self.unhover = function(evt)
@@ -860,16 +863,16 @@ var editable_list = function(editor)
     if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
   }
 
-  self.click = function(list,back,add,evt)
+  self.click = function(list,back,add,del,evt)
   {
     if(self.hovering_i)
     {
       self.selected_i = self.hovering_i;
-      self.selected(self.selected_i);
+      self.selected(self.selected_i,self.delete_mod);
     }
   }
 
-  self.draw = function(list,title,back,add,ctx)
+  self.draw = function(list,title,back,add,del,ctx)
   {
     var off_y = 0;
     var box_y;
@@ -894,7 +897,12 @@ var editable_list = function(editor)
       {
         var oldStyle = ctx.fillStyle;
         ctx.fillStyle = editor.hover_bg_color;
-        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        if(!del)
+          ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        else if(del && self.delete_mod)
+          ctx.fillRect(editor.x+editor.w-editor.selection_box_h,box_y,editor.selection_box_h,editor.selection_box_h);
+        else if(del && !self.delete_mod)
+          ctx.fillRect(editor.x,box_y,editor.w-editor.selection_box_h,editor.selection_box_h);
         ctx.fillStyle = oldStyle;
       }
       drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
@@ -944,8 +952,8 @@ var content_editor = function(editor)
   var contents = [{name:"null"},{name:"Domains"},{name:"Groups"},{name:"Objects"}]; //hacked "list" for selector selector
 
   self.editable_list = new editable_list(self);
-  self.editable_list.hovered = function(i){};//ignore
-  self.editable_list.selected = function(i)
+  self.editable_list.hovered = function(i,del){};//ignore
+  self.editable_list.selected = function(i,del)
   {
     if(i == -1)
     {
@@ -969,6 +977,18 @@ var content_editor = function(editor)
           case 2: self.edit_type = CONTENT_ENUM_GROUP;  self.cur_title = "Groups:";  break;
           case 3: self.edit_type = CONTENT_ENUM_OBJECT; self.cur_title = "Objects:"; break;
         }
+      }
+      else if(del)
+      {
+        var list;
+        var del;
+        switch(self.edit_type)
+        {
+          case CONTENT_ENUM_DOMAIN: list = domains; del = ddomain; break;
+          case CONTENT_ENUM_GROUP:  list = groups;  del = dgroup;  break;
+          case CONTENT_ENUM_OBJECT: list = objects; del = dobject; break;
+        }
+        del(list[i]);
       }
       else
       {
@@ -1069,10 +1089,10 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_LIST:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_NONE:   self.editable_list.hover(contents,0,0,evt); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.hover(domains, 1,1,evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.hover(groups,  1,1,evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.hover(objects, 1,1,evt); break;
+          case CONTENT_ENUM_NONE:   self.editable_list.hover(contents,0,0,0,evt); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_list.hover(domains, 1,1,1,evt); break;
+          case CONTENT_ENUM_GROUP:  self.editable_list.hover(groups,  1,1,1,evt); break;
+          case CONTENT_ENUM_OBJECT: self.editable_list.hover(objects, 1,1,1,evt); break;
         }
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
@@ -1098,10 +1118,10 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_LIST:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_NONE:   self.editable_list.click(contents,0,0,evt); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.click(domains, 1,1,evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.click(groups,  1,1,evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.click(objects, 1,1,evt); break;
+          case CONTENT_ENUM_NONE:   self.editable_list.click(contents,0,0,0,evt); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_list.click(domains, 1,1,1,evt); break;
+          case CONTENT_ENUM_GROUP:  self.editable_list.click(groups,  1,1,1,evt); break;
+          case CONTENT_ENUM_OBJECT: self.editable_list.click(objects, 1,1,1,evt); break;
         }
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
@@ -1129,10 +1149,10 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_LIST:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_NONE:   self.editable_list.draw(contents,self.cur_title,0,0,ctx); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.draw(domains, self.cur_title,1,1,ctx); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.draw(groups,  self.cur_title,1,1,ctx); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.draw(objects, self.cur_title,1,1,ctx); break;
+          case CONTENT_ENUM_NONE:   self.editable_list.draw(contents,self.cur_title,0,0,0,ctx); break;
+          case CONTENT_ENUM_DOMAIN: self.editable_list.draw(domains, self.cur_title,1,1,1,ctx); break;
+          case CONTENT_ENUM_GROUP:  self.editable_list.draw(groups,  self.cur_title,1,1,1,ctx); break;
+          case CONTENT_ENUM_OBJECT: self.editable_list.draw(objects, self.cur_title,1,1,1,ctx); break;
         }
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
