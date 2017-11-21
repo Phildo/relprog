@@ -51,6 +51,7 @@ var domain = function()
   self.name = "";
   self.mutex = 1;
   self.directed = 0;
+  self.t_one_to_one = 0;
   self.viz = VIZ_ENUM_NONE;
   self.valid = 0;
 }

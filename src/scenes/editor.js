@@ -324,7 +324,7 @@ var editable_toggle = function(editor)
 
 }
 
-var selectable_viz = function(editor)
+var editable_viz = function(editor)
 {
   var self = this;
   self.text = "";
@@ -386,7 +386,7 @@ var selectable_viz = function(editor)
 
 }
 
-var selectable_domain = function(editor)
+var editable_domain = function(editor)
 {
   var self = this;
   self.text = "";
@@ -439,7 +439,7 @@ var selectable_domain = function(editor)
 
 }
 
-var editable_domain = function(editor)
+var domain_editor = function(editor)
 {
   var self = this;
 
@@ -453,26 +453,30 @@ var editable_domain = function(editor)
   self.set_domain = function(domain)
   {
     self.domain = domain;
-    self.name_editor.set_val(    self.domain.name);
-    self.mutex_editor.set_val(   self.domain.mutex);
-    self.directed_editor.set_val(self.domain.directed);
-    self.viz_editor.set_val(     self.domain.viz);
+    self.editable_name.set_val(        self.domain.name);
+    self.editable_mutex.set_val(       self.domain.mutex);
+    self.editable_directed.set_val(    self.domain.directed);
+    self.editable_t_one_to_one.set_val(self.domain.t_one_to_one);
+    self.editable_viz.set_val(         self.domain.viz);
   }
 
-  self.name_editor             = new editable_text(editor);
-  self.name_editor.changed     = function() { self.domain.name     = self.name_editor.val;     };
-  self.mutex_editor            = new editable_toggle(editor);
-  self.mutex_editor.changed    = function() { self.domain.mutex    = self.mutex_editor.val;    };
-  self.directed_editor         = new editable_toggle(editor);
-  self.directed_editor.changed = function() { self.domain.directed = self.directed_editor.val; };
-  self.viz_editor              = new selectable_viz(editor);
-  self.viz_editor.changed      = function() { self.domain.viz      = self.viz_editor.val;      };
+  self.editable_name                 = new editable_text(editor);
+  self.editable_name.changed         = function() { self.domain.name         = self.editable_name.val;     };
+  self.editable_mutex                = new editable_toggle(editor);
+  self.editable_mutex.changed        = function() { self.domain.mutex        = self.editable_mutex.val;    };
+  self.editable_directed             = new editable_toggle(editor);
+  self.editable_directed.changed     = function() { self.domain.directed     = self.editable_directed.val; };
+  self.editable_t_one_to_one         = new editable_toggle(editor);
+  self.editable_t_one_to_one.changed = function() { self.domain.t_one_to_one = self.editable_t_one_to_one.val; };
+  self.editable_viz                  = new editable_viz(editor);
+  self.editable_viz.changed          = function() { self.domain.viz          = self.editable_viz.val;      };
 
   self.properties = [];
-  self.properties.push(self.name_editor);
-  self.properties.push(self.mutex_editor);
-  self.properties.push(self.directed_editor);
-  self.properties.push(self.viz_editor);
+  self.properties.push(self.editable_name);
+  self.properties.push(self.editable_mutex);
+  self.properties.push(self.editable_directed);
+  self.properties.push(self.editable_t_one_to_one);
+  self.properties.push(self.editable_viz);
 
   self.hover = function(domain,evt)
   {
@@ -559,7 +563,7 @@ var editable_domain = function(editor)
   }
 }
 
-var editable_group = function(editor)
+var group_editor = function(editor)
 {
   var self = this;
 
@@ -573,38 +577,38 @@ var editable_group = function(editor)
   self.set_group = function(group)
   {
     self.group = group;
-    self.name_editor.set_val(  self.group.name);
-    self.domain_editor.set_val(self.group.domain);
-    self.seq_editor.set_val(   self.group.seq);
-    self.color_editor.set_val( self.group.color);
-    self.img_editor.set_val(   self.group.img);
-    self.wx_editor.set_val(    self.group.wx);
-    self.wy_editor.set_val(    self.group.wy);
+    self.editable_name.set_val(  self.group.name);
+    self.editable_domain.set_val(self.group.domain);
+    self.editable_seq.set_val(   self.group.seq);
+    self.editable_color.set_val( self.group.color);
+    self.editable_img.set_val(   self.group.img);
+    self.editable_wx.set_val(    self.group.wx);
+    self.editable_wy.set_val(    self.group.wy);
   }
 
-  self.name_editor           = new editable_text(editor);
-  self.name_editor.changed   = function() { self.group.name   = self.name_editor.val;     };
-  self.domain_editor         = new selectable_domain(editor);
-  self.domain_editor.changed = function() { self.group.domain = self.domain_editor.val;    };
-  self.seq_editor            = new editable_int(editor);
-  self.seq_editor.changed    = function() { self.group.seq    = self.seq_editor.val;    };
-  self.color_editor          = new editable_color(editor);
-  self.color_editor.changed  = function() { self.group.color  = self.color_editor.val;    };
-  self.img_editor            = new editable_img(editor);
-  self.img_editor.changed    = function() { self.group.img    = self.img_editor.val;    };
-  self.wx_editor             = new editable_float(editor);
-  self.wx_editor.changed     = function() { self.group.wx     = self.wx_editor.val;    };
-  self.wy_editor             = new editable_float(editor);
-  self.wy_editor.changed     = function() { self.group.wy     = self.wy_editor.val;    };
+  self.editable_name           = new editable_text(editor);
+  self.editable_name.changed   = function() { self.group.name   = self.editable_name.val;     };
+  self.editable_domain         = new editable_domain(editor);
+  self.editable_domain.changed = function() { self.group.domain = self.editable_domain.val;    };
+  self.editable_seq            = new editable_int(editor);
+  self.editable_seq.changed    = function() { self.group.seq    = self.editable_seq.val;    };
+  self.editable_color          = new editable_color(editor);
+  self.editable_color.changed  = function() { self.group.color  = self.editable_color.val;    };
+  self.editable_img            = new editable_img(editor);
+  self.editable_img.changed    = function() { self.group.img    = self.editable_img.val;    };
+  self.editable_wx             = new editable_float(editor);
+  self.editable_wx.changed     = function() { self.group.wx     = self.editable_wx.val;    };
+  self.editable_wy             = new editable_float(editor);
+  self.editable_wy.changed     = function() { self.group.wy     = self.editable_wy.val;    };
 
   self.properties = [];
-  self.properties.push(self.name_editor);
-  self.properties.push(self.domain_editor);
-  self.properties.push(self.seq_editor);
-  self.properties.push(self.color_editor);
-  self.properties.push(self.img_editor);
-  self.properties.push(self.wx_editor);
-  self.properties.push(self.wy_editor);
+  self.properties.push(self.editable_name);
+  self.properties.push(self.editable_domain);
+  self.properties.push(self.editable_seq);
+  self.properties.push(self.editable_color);
+  self.properties.push(self.editable_img);
+  self.properties.push(self.editable_wx);
+  self.properties.push(self.editable_wy);
 
   self.hover = function(group,evt)
   {
@@ -691,7 +695,7 @@ var editable_group = function(editor)
   }
 }
 
-var editable_object = function(editor)
+var object_editor = function(editor)
 {
   var self = this;
 
@@ -705,22 +709,22 @@ var editable_object = function(editor)
   self.set_object = function(object)
   {
     self.object = object;
-    self.name_editor.set_val( self.object.name);
-    self.color_editor.set_val(self.object.color);
-    self.img_editor.set_val(  self.object.img);
+    self.editable_name.set_val( self.object.name);
+    self.editable_color.set_val(self.object.color);
+    self.editable_img.set_val(  self.object.img);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.name_editor.changed  = function() { self.object.name  = self.name_editor.val;  };
-  self.color_editor         = new editable_color(editor);
-  self.color_editor.changed = function() { self.object.color = self.color_editor.val; };
-  self.img_editor           = new editable_img(editor);
-  self.img_editor.changed   = function() { self.object.img   = self.img_editor.val;   };
+  self.editable_name          = new editable_text(editor);
+  self.editable_name.changed  = function() { self.object.name  = self.editable_name.val;  };
+  self.editable_color         = new editable_color(editor);
+  self.editable_color.changed = function() { self.object.color = self.editable_color.val; };
+  self.editable_img           = new editable_img(editor);
+  self.editable_img.changed   = function() { self.object.img   = self.editable_img.val;   };
 
   self.properties = [];
-  self.properties.push(self.name_editor);
-  self.properties.push(self.color_editor);
-  self.properties.push(self.img_editor);
+  self.properties.push(self.editable_name);
+  self.properties.push(self.editable_color);
+  self.properties.push(self.editable_img);
 
   self.hover = function(object,evt)
   {
@@ -986,9 +990,9 @@ var content_editor = function(editor)
         var edset;
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: list = domains; gen = ndomain; if(del) del = ddomain; editor = self.editable_domain; edset = self.editable_domain.set_domain; break;
-          case CONTENT_ENUM_GROUP:  list = groups;  gen = ngroup;  if(del) del = dgroup;  editor = self.editable_group;  edset = self.editable_group.set_group;   break;
-          case CONTENT_ENUM_OBJECT: list = objects; gen = nobject; if(del) del = dobject; editor = self.editable_object; edset = self.editable_object.set_object; break;
+          case CONTENT_ENUM_DOMAIN: list = domains; gen = ndomain; if(del) del = ddomain; editor = self.domain_editor; edset = self.domain_editor.set_domain; break;
+          case CONTENT_ENUM_GROUP:  list = groups;  gen = ngroup;  if(del) del = dgroup;  editor = self.group_editor;  edset = self.group_editor.set_group;   break;
+          case CONTENT_ENUM_OBJECT: list = objects; gen = nobject; if(del) del = dobject; editor = self.object_editor; edset = self.object_editor.set_object; break;
         }
 
         var is_new = 0;
@@ -999,7 +1003,7 @@ var content_editor = function(editor)
           self.cur_selected_i = i;
           self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
           edset(list[self.cur_selected_i]);
-          if(is_new) editor.name_editor.activate(0,self.selection_box_h);
+          if(is_new) editor.editable_name.activate(0,self.selection_box_h);
 
           self.cur_title = "";
         }
@@ -1013,9 +1017,9 @@ var content_editor = function(editor)
   self.cur_title = "Edit:";
   self.cur_selected_i = 0;
 
-  self.editable_domain = new editable_domain(self);
-  self.editable_domain.hovered = function(i){};//ignore
-  self.editable_domain.selected = function(i)
+  self.domain_editor = new domain_editor(self);
+  self.domain_editor.hovered = function(i){};//ignore
+  self.domain_editor.selected = function(i)
   {
     if(i == -1) //back btn
     {
@@ -1023,15 +1027,15 @@ var content_editor = function(editor)
       self.edit_mode = EDIT_MODE_ENUM_LIST;
       self.cur_title = "Domains:";
 
-      self.editable_domain.hovering_i = 0;
-      self.editable_domain.selected_i = 0;
+      self.domain_editor.hovering_i = 0;
+      self.domain_editor.selected_i = 0;
       self.editable_list.hovering_i = -1;
     }
   };
 
-  self.editable_group = new editable_group(self);
-  self.editable_group.hovered = function(i){};//ignore
-  self.editable_group.selected = function(i)
+  self.group_editor = new group_editor(self);
+  self.group_editor.hovered = function(i){};//ignore
+  self.group_editor.selected = function(i)
   {
     if(i == -1) //back btn
     {
@@ -1039,15 +1043,15 @@ var content_editor = function(editor)
       self.edit_mode = EDIT_MODE_ENUM_LIST;
       self.cur_title = "Groups:";
 
-      self.editable_group.hovering_i = 0;
-      self.editable_group.selected_i = 0;
+      self.group_editor.hovering_i = 0;
+      self.group_editor.selected_i = 0;
       self.editable_list.hovering_i = -1;
     }
   };
 
-  self.editable_object = new editable_object(self);
-  self.editable_object.hovered = function(i){};//ignore
-  self.editable_object.selected = function(i)
+  self.object_editor = new object_editor(self);
+  self.object_editor.hovered = function(i){};//ignore
+  self.object_editor.selected = function(i)
   {
     if(i == -1) //back btn
     {
@@ -1055,8 +1059,8 @@ var content_editor = function(editor)
       self.edit_mode = EDIT_MODE_ENUM_LIST;
       self.cur_title = "Objects:";
 
-      self.editable_object.hovering_i = 0;
-      self.editable_object.selected_i = 0;
+      self.object_editor.hovering_i = 0;
+      self.object_editor.selected_i = 0;
       self.editable_list.hovering_i = -1;
     }
   };
@@ -1091,9 +1095,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.hover(domains[self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_group.hover(groups[  self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_object.hover(objects[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_DOMAIN: self.domain_editor.hover(domains[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_GROUP:  self.group_editor.hover(groups[  self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_OBJECT: self.object_editor.hover(objects[self.cur_selected_i],evt); break;
         }
         break;
     }
@@ -1120,9 +1124,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.click(domains[self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_group.click(groups[  self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_object.click(objects[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_DOMAIN: self.domain_editor.click(domains[self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_GROUP:  self.group_editor.click(groups[  self.cur_selected_i],evt); break;
+          case CONTENT_ENUM_OBJECT: self.object_editor.click(objects[self.cur_selected_i],evt); break;
         }
         break;
     }
@@ -1151,9 +1155,9 @@ var content_editor = function(editor)
       case EDIT_MODE_ENUM_INDIVIDUAL:
         switch(self.edit_type)
         {
-          case CONTENT_ENUM_DOMAIN: self.editable_domain.draw(domains[self.cur_selected_i],ctx); break;
-          case CONTENT_ENUM_GROUP:  self.editable_group.draw(groups[  self.cur_selected_i],ctx); break;
-          case CONTENT_ENUM_OBJECT: self.editable_object.draw(objects[self.cur_selected_i],ctx); break;
+          case CONTENT_ENUM_DOMAIN: self.domain_editor.draw(domains[self.cur_selected_i],ctx); break;
+          case CONTENT_ENUM_GROUP:  self.group_editor.draw(groups[  self.cur_selected_i],ctx); break;
+          case CONTENT_ENUM_OBJECT: self.object_editor.draw(objects[self.cur_selected_i],ctx); break;
         }
         break;
     }

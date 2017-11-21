@@ -60,12 +60,14 @@ var defaultState = function()
   d.name = "Space";
   d.mutex = 1;
   d.directed = 0;
+  d.t_one_to_one = 0;
   d.viz = VIZ_ENUM_SPACIAL;
 
   d = ndomain();
   d.name = "Time";
   d.mutex = 1;
   d.directed = 1;
+  d.t_one_to_one = 1;
   d.viz = VIZ_ENUM_TEMPORAL;
 
   var c;
