@@ -24,6 +24,61 @@ var cyan    = "#00FFFF";
 var magenta = "#FF00FF";
 var yellow  = "#FFFF00";
 
+var rand_color_list = [
+  red,
+  green,
+  blue,
+  cyan,
+  magenta,
+  yellow,
+];
+var rand_color_i = 0;
+var rand_color = function()
+{
+  var c = rand_color_list[rand_color_i];
+  rand_color_i++;
+  if(rand_color_i > rand_color_list.length) //shuffle- ensure spacing between last is still far from first
+  {
+    var s;
+    var e;
+    var i;
+    var j;
+    var tmp;
+    //shuffle first half
+    s = 0;
+    e = floor(rand_color_list.length/2);
+    for(i = s; i < e; i++)
+    {
+      tmp = rand_color_list[i];
+      j = i+randIntBelow(e-s-i);
+      rand_color_list[i] = rand_color_list[j];
+      rand_color_list[j] = tmp;
+    }
+    //shuffle second half
+    s = e;
+    e = rand_color_list.length;
+    for(i = s; i < e; i++)
+    {
+      tmp = rand_color_list[i];
+      j = i+randIntBelow(e-s-i);
+      rand_color_list[i] = rand_color_list[j];
+      rand_color_list[j] = tmp;
+    }
+    //shuffle middle half
+    s = floor(rand_color_list.length/4);
+    e = floor(rand_color_list.length*3/4);
+    for(i = s; i < e; i++)
+    {
+      tmp = rand_color_list[i];
+      j = i+randIntBelow(e-s-i);
+      rand_color_list[i] = rand_color_list[j];
+      rand_color_list[j] = tmp;
+    }
+    rand_color_i = 0;
+  }
+  return c;
+}
+
 //math (raw)
 function mapVal(from_min, from_max, to_min, to_max, v) { return ((v-from_min)/(from_max-from_min))*(to_max-to_min)+to_min; }
 function clamp(a,b,v) { if(v < a) return a; if(v > b) return b; return v; }

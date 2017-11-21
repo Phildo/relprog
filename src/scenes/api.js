@@ -22,6 +22,7 @@ var ngroup = function()
 {
   var n = new group();
   n.id = cur_group_id++;
+  n.color = rand_color();
   groups.push(n);
   return n;
 }
@@ -46,6 +47,7 @@ var nobject = function()
 {
   var n = new object();
   n.id = cur_object_id++;
+  n.color = rand_color();
   objects.push(n);
   return n;
 }
@@ -68,6 +70,7 @@ var nannotation = function()
 {
   var n = new annotation();
   n.id = cur_annotation_id++;
+  n.color = rand_color();
   annotations.push(n);
   return n;
 }
@@ -86,6 +89,7 @@ var ngroup_annotation = function()
 {
   var n = new group_annotation();
   n.id = cur_group_annotation_id++;
+  n.color = rand_color();
   group_annotations.push(n);
   return n;
 }
@@ -104,6 +108,7 @@ var nobject_annotation = function()
 {
   var n = new object_annotation();
   n.id = cur_object_annotation_id++;
+  n.color = rand_color();
   object_annotations.push(n);
   return n;
 }

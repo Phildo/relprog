@@ -1189,12 +1189,6 @@ var timeline_editor = function()
   self.selection_box_text_off_y = self.font_size;
   self.selection_box_h = self.font_size+5;
 
-  var old_h = self.h;
-  self.h = self.selection_box_h+
-  domains.length*self.selection_box_h+
-  groups.length*self.selection_box_h;
-  self.y -= self.h-old_h;
-
   var ENUM;
 
   self.hover = function(evt)
@@ -1218,7 +1212,7 @@ var timeline_editor = function()
 
     var old_h = self.h;
     self.h = self.selection_box_h+
-    domains.length*self.selection_box_h+
+    (domains.length*2-1)*self.selection_box_h+
     groups.length*self.selection_box_h;
     self.y -= self.h-old_h;
 
@@ -1242,9 +1236,51 @@ var timeline_editor = function()
       ctx.fillText(name,self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
       off_y += self.selection_box_h;
 
+      if(i > 0)
+      {
+        box_y = self.y+off_y;
+        drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
+        ctx.fillText("+",self.x+self.selection_box_h+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+        off_y += self.selection_box_h;
+      }
+
       for(var j = 0; j < domain_groups_cached[i].length; j++)
       {
         box_y = self.y+off_y;
+
+        var group_i = 0;
+        for(var k = 0; k < groups.length; k++)
+          if(domain_groups_cached[i][j].id == groups[k].id)
+            group_i = k;
+
+        ctx.fillStyle = groups[group_i].color;
+        if(!group_transitions_cached[group_i].length)
+        {
+          ctx.fillRect(self.x,box_y,self.w,self.selection_box_h);
+        }
+        else
+        {
+          var cur_in = 0;
+          var in_t = 0;
+          var gts = group_transitions_cached[group_i];
+          var gt;
+          for(var k = 0; k < gts.length; k++)
+          {
+            gt = gts[k];
+            if(!cur_in && gt.direction == TRANSITION_DIRECTION_ENUM_IN)
+            {
+              cur_in = 1;
+              in_t = gt.t;
+            }
+            else if(cur_in  && gt.direction == TRANSITION_DIRECTION_ENUM_OUT)
+            {
+              ctx.fillRect(lerp(self.x,self.x_self.w,in_t/(t_breadth+1)),box_y,lerp(self.x,self.x_self.w,g.t/(t_breadth+1)),self.selection_box_h);
+              cur_in = 0;
+            }
+          }
+        }
+        ctx.fillStyle = black;
+
         drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
         name = "(No Group)";
         if(domain_groups_cached[i][j].name && domain_groups_cached[i][j].name != "") name = domain_groups_cached[i][j].name;

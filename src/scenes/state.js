@@ -9,6 +9,8 @@ var object_transitions; var cur_object_transition_id; var object_transitions_cac
 var camera_targets;     var cur_camera_target_id;     var camera_targets_cached_valid;
 
 var domain_groups_cached;
+var group_transitions_cached;
+var object_transitions_cached;
 
 //cache state
 var spacial_domain;
@@ -219,6 +221,28 @@ var calculateCacheState = function()
     {
       if(groups[j].domain == i)
         domain_groups_cached[i].push(groups[j]);
+    }
+  }
+
+  group_transitions_cached = [];
+  for(var i = 0; i < groups.length; i++)
+  {
+    group_transitions_cached[i] = [];
+    for(var j = 0; j < group_transitions.length; j++)
+    {
+      if(group_transitions[j].group == i)
+        group_transitions_cached[i].push(group_transitions[j]);
+    }
+  }
+
+  object_transitions_cached = [];
+  for(var i = 0; i < objects.length; i++)
+  {
+    object_transitions_cached[i] = [];
+    for(var j = 0; j < object_transitions.length; j++)
+    {
+      if(object_transitions[j].object == i)
+        object_transitions_cached[i].push(object_transitions[j]);
     }
   }
 
