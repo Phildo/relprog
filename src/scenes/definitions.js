@@ -154,3 +154,51 @@ var camera_target = function()
   self.cached_valid = 0;
 }
 
+var content_for_content = function(type)
+{
+  switch(type)
+  {
+    case CONTENT_ENUM_DOMAIN:            return domain;            break;
+    case CONTENT_ENUM_GROUP:             return group;             break;
+    case CONTENT_ENUM_OBJECT:            return object;            break;
+    case CONTENT_ENUM_ANNOTATION:        return annotation;        break;
+    case CONTENT_ENUM_GROUP_ANNOTATION:  return group_annotation;  break;
+    case CONTENT_ENUM_OBJECT_ANNOTATION: return object_annotation; break;
+    case CONTENT_ENUM_GROUP_TRANSITION:  return group_transition;  break;
+    case CONTENT_ENUM_OBJECT_TRANSITION: return object_transition; break;
+    case CONTENT_ENUM_CAMERA_TARGET:     return camera_target;     break;
+  }
+}
+
+var gen_for_content = function(type)
+{
+  switch(type)
+  {
+    case CONTENT_ENUM_DOMAIN:            return ndomain;            break;
+    case CONTENT_ENUM_GROUP:             return ngroup;             break;
+    case CONTENT_ENUM_OBJECT:            return nobject;            break;
+    case CONTENT_ENUM_ANNOTATION:        return nannotation;        break;
+    case CONTENT_ENUM_GROUP_ANNOTATION:  return ngroup_annotation;  break;
+    case CONTENT_ENUM_OBJECT_ANNOTATION: return nobject_annotation; break;
+    case CONTENT_ENUM_GROUP_TRANSITION:  return ngroup_transition;  break;
+    case CONTENT_ENUM_OBJECT_TRANSITION: return nobject_transition; break;
+    case CONTENT_ENUM_CAMERA_TARGET:     return ncamera_target;     break;
+  }
+}
+
+var del_for_content = function(type)
+{
+  switch(type)
+  {
+    case CONTENT_ENUM_DOMAIN:            return ddomain;            break;
+    case CONTENT_ENUM_GROUP:             return dgroup;             break;
+    case CONTENT_ENUM_OBJECT:            return dobject;            break;
+    case CONTENT_ENUM_ANNOTATION:        return dannotation;        break;
+    case CONTENT_ENUM_GROUP_ANNOTATION:  return dgroup_annotation;  break;
+    case CONTENT_ENUM_OBJECT_ANNOTATION: return dobject_annotation; break;
+    case CONTENT_ENUM_GROUP_TRANSITION:  return dgroup_transition;  break;
+    case CONTENT_ENUM_OBJECT_TRANSITION: return dobject_transition; break;
+    case CONTENT_ENUM_CAMERA_TARGET:     return dcamera_target;     break;
+  }
+}
+

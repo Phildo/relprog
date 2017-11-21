@@ -811,6 +811,702 @@ var object_editor = function(editor)
   }
 }
 
+var annotation_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.annotation = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_annotation = function(annotation)
+  {
+    self.annotation = annotation;
+    self.name_editor.set_val( self.annotation.name);
+    self.color_editor.set_val(self.annotation.color);
+    self.img_editor.set_val(  self.annotation.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.annotation.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.annotation.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.annotation.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(annotation,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(annotation,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(annotation,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("annotation ("+annotation.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
+var group_annotation_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.group_annotation = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_group_annotation = function(group_annotation)
+  {
+    self.group_annotation = group_annotation;
+    self.name_editor.set_val( self.group_annotation.name);
+    self.color_editor.set_val(self.group_annotation.color);
+    self.img_editor.set_val(  self.group_annotation.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.group_annotation.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.group_annotation.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.group_annotation.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(group_annotation,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(group_annotation,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(group_annotation,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("group_annotation ("+group_annotation.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
+var object_annotation_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.object_annotation = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_object_annotation = function(object_annotation)
+  {
+    self.object_annotation = object_annotation;
+    self.name_editor.set_val( self.object_annotation.name);
+    self.color_editor.set_val(self.object_annotation.color);
+    self.img_editor.set_val(  self.object_annotation.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.object_annotation.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.object_annotation.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.object_annotation.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(object_annotation,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(object_annotation,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(object_annotation,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("object_annotation ("+object_annotation.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
+var group_transition_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.group_transition = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_group_transition = function(group_transition)
+  {
+    self.group_transition = group_transition;
+    self.name_editor.set_val( self.group_transition.name);
+    self.color_editor.set_val(self.group_transition.color);
+    self.img_editor.set_val(  self.group_transition.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.group_transition.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.group_transition.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.group_transition.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(group_transition,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(group_transition,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(group_transition,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("group_transition ("+group_transition.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
+var object_transition_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.object_transition = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_object_transition = function(object_transition)
+  {
+    self.object_transition = object_transition;
+    self.name_editor.set_val( self.object_transition.name);
+    self.color_editor.set_val(self.object_transition.color);
+    self.img_editor.set_val(  self.object_transition.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.object_transition.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.object_transition.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.object_transition.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(object_transition,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(object_transition,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(object_transition,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("object_transition ("+object_transition.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
+var camera_target_editor = function(editor)
+{
+  var self = this;
+
+  self.hovering_i = 0;
+  self.selected_i = 0;
+
+  self.hovered  = function(i) { }; //overwrite
+  self.selected = function(i) { }; //overwrite
+
+  self.camera_target = 0; //actually only necessary to prevent clumsy partial-caching for callbacks- but logically unnecessary
+  self.set_camera_target = function(camera_target)
+  {
+    self.camera_target = camera_target;
+    self.name_editor.set_val( self.camera_target.name);
+    self.color_editor.set_val(self.camera_target.color);
+    self.img_editor.set_val(  self.camera_target.img);
+  }
+
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.camera_target.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.camera_target.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.camera_target.img   = self.img_editor.val;   calculateCacheState(); };
+
+  self.properties = [];
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+
+  self.hover = function(camera_target,evt)
+  {
+    var old_hovering_i = self.hovering_i;
+    // if(!fWithin(editor.x,editor.x+editor.w,evt.doX)) return; //commented out because should be assumed
+    self.hovering_i = 0;
+
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(
+      fWithin(box_y,box_y+editor.selection_box_h,evt.doY) &&
+      fWithin(editor.x,editor.x+editor.back_btn_w,evt.doX)
+    )
+      self.hovering_i = -1; //back btn
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(fWithin(box_y,box_y+editor.selection_box_h,evt.doY)) self.hovering_i = i+1;
+      self.properties[i].hover(box_y,evt);
+      off_y += editor.selection_box_h;
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
+  }
+
+  self.click = function(camera_target,evt)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      for(var i = 0; i < self.properties.length; i++) self.properties[i].deactivate();
+      self.selected(self.hovering_i);
+    }
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        for(var j = 0; j < self.properties.length; j++) if(j != i) self.properties[j].deactivate();
+        self.properties[i].activate(0,off_y);
+        self.properties[i].click(box_y,evt);
+      }
+      off_y += editor.selection_box_h;
+    }
+  }
+
+  self.draw = function(camera_target,ctx)
+  {
+    var off_y = 0;
+    var box_y;
+    box_y = editor.y+off_y;
+    if(self.hovering_i == -1)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = editor.hover_bg_color;
+      ctx.fillRect(editor.x,box_y,editor.back_btn_w,editor.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
+    drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+    ctx.fillText("camera_target ("+camera_target.name+"):",editor.x+editor.back_btn_w+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+    off_y += editor.selection_box_h;
+
+    for(var i = 0; i < self.properties.length; i++)
+    {
+      box_y = editor.y+off_y;
+      if(self.hovering_i == i+1)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = editor.hover_bg_color;
+        ctx.fillRect(editor.x,box_y,editor.w,editor.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
+      drawLine(editor.x,box_y+editor.selection_box_h,editor.x+editor.w,box_y+editor.selection_box_h,ctx);
+      ctx.fillText(self.properties[i].text,editor.x+editor.selection_box_text_off_x,box_y+editor.selection_box_text_off_y);
+      off_y += editor.selection_box_h;
+    }
+  }
+}
+
 var editable_list = function(editor)
 {
   var self = this;
@@ -952,7 +1648,57 @@ var content_editor = function()
   self.selection_box_text_off_y = self.font_size;
   self.selection_box_h = self.font_size+5;
 
-  var contents = [{name:"null"},{name:"Domains"},{name:"Groups"},{name:"Objects"}]; //hacked "list" for selector selector
+  var editor_for_content = function(type)
+  {
+    switch(type)
+    {
+      case CONTENT_ENUM_DOMAIN:            return self.domain_editor;            break;
+      case CONTENT_ENUM_GROUP:             return self.group_editor;             break;
+      case CONTENT_ENUM_OBJECT:            return self.object_editor;            break;
+      case CONTENT_ENUM_ANNOTATION:        return self.annotation_editor;        break;
+      case CONTENT_ENUM_GROUP_ANNOTATION:  return self.group_annotation_editor;  break;
+      case CONTENT_ENUM_OBJECT_ANNOTATION: return self.object_annotation_editor; break;
+      case CONTENT_ENUM_GROUP_TRANSITION:  return self.group_transition_editor;  break;
+      case CONTENT_ENUM_OBJECT_TRANSITION: return self.object_transition_editor; break;
+      case CONTENT_ENUM_CAMERA_TARGET:     return self.camera_target_editor;     break;
+    }
+  }
+
+  var edset_for_content = function(type)
+  {
+    switch(type)
+    {
+      case CONTENT_ENUM_DOMAIN:            return self.domain_editor.set_domain;                       break;
+      case CONTENT_ENUM_GROUP:             return self.group_editor.set_group;                         break;
+      case CONTENT_ENUM_OBJECT:            return self.object_editor.set_object;                       break;
+      case CONTENT_ENUM_ANNOTATION:        return self.annotation_editor.set_annotation;               break;
+      case CONTENT_ENUM_GROUP_ANNOTATION:  return self.group_annotation_editor.set_group_annotation;   break;
+      case CONTENT_ENUM_OBJECT_ANNOTATION: return self.object_annotation_editor.set_object_annotation; break;
+      case CONTENT_ENUM_GROUP_TRANSITION:  return self.group_transition_editor.set_group_transition;   break;
+      case CONTENT_ENUM_OBJECT_TRANSITION: return self.object_transition_editor.set_object_transition; break;
+      case CONTENT_ENUM_CAMERA_TARGET:     return self.camera_target_editor.set_camera_target;         break;
+    }
+  }
+
+  var title_for_content = function(type)
+  {
+    switch(type)
+    {
+      case CONTENT_ENUM_DOMAIN:            return "domain";            break;
+      case CONTENT_ENUM_GROUP:             return "group";             break;
+      case CONTENT_ENUM_OBJECT:            return "object";            break;
+      case CONTENT_ENUM_ANNOTATION:        return "annotation";        break;
+      case CONTENT_ENUM_GROUP_ANNOTATION:  return "group_annotation";  break;
+      case CONTENT_ENUM_OBJECT_ANNOTATION: return "object_annotation"; break;
+      case CONTENT_ENUM_GROUP_TRANSITION:  return "group_transition";  break;
+      case CONTENT_ENUM_OBJECT_TRANSITION: return "object_transition"; break;
+      case CONTENT_ENUM_CAMERA_TARGET:     return "camera_target";     break;
+    }
+  }
+
+  var contents = []; //hacked "list" for selector selector
+  for(var i = 0; i < CONTENT_ENUM_COUNT; i++)
+    contents.push({name:title_for_content(i)});
 
   self.editable_list = new editable_list(self);
   self.editable_list.hovered = function(i,del){};//ignore
@@ -965,8 +1711,13 @@ var content_editor = function()
         case CONTENT_ENUM_DOMAIN:
         case CONTENT_ENUM_GROUP:
         case CONTENT_ENUM_OBJECT:
+        case CONTENT_ENUM_ANNOTATION:
+        case CONTENT_ENUM_GROUP_ANNOTATION:
+        case CONTENT_ENUM_OBJECT_ANNOTATION:
+        case CONTENT_ENUM_GROUP_TRANSITION:
+        case CONTENT_ENUM_OBJECT_TRANSITION:
+        case CONTENT_ENUM_CAMERA_TARGET:
           self.edit_type = CONTENT_ENUM_NONE;
-          self.cur_title = "Edit:";
           break;
       }
     }
@@ -974,45 +1725,29 @@ var content_editor = function()
     {
       if(self.edit_type == CONTENT_ENUM_NONE)
       {
-        switch(i)
-        {
-          case 1: self.edit_type = CONTENT_ENUM_DOMAIN; self.cur_title = "Domains:"; break;
-          case 2: self.edit_type = CONTENT_ENUM_GROUP;  self.cur_title = "Groups:";  break;
-          case 3: self.edit_type = CONTENT_ENUM_OBJECT; self.cur_title = "Objects:"; break;
-        }
+        self.edit_type = i; //CONTENT_ENUM_...
       }
       else
       {
-        var list;
-        var gen;
-        var editor;
-        var edset;
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_DOMAIN: list = domains; gen = ndomain; if(del) del = ddomain; editor = self.domain_editor; edset = self.domain_editor.set_domain; break;
-          case CONTENT_ENUM_GROUP:  list = groups;  gen = ngroup;  if(del) del = dgroup;  editor = self.group_editor;  edset = self.group_editor.set_group;   break;
-          case CONTENT_ENUM_OBJECT: list = objects; gen = nobject; if(del) del = dobject; editor = self.object_editor; edset = self.object_editor.set_object; break;
-        }
+        var list = list_for_content(self.edit_type);
 
         var is_new = 0;
         if(del && i != list.length)
         {
-          del(list[i]);
+          del_for_content(self.edit_type)(list[i]);
           calculateCacheState();
         }
         else
         {
-          if(i == list.length) { gen(); is_new = 1; }
+          if(i == list.length) { gen_for_content(self.edit_type)(); is_new = 1; }
           self.cur_selected_i = i;
           self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
-          edset(list[self.cur_selected_i]);
+          edset_for_content(self.edit_type)(list[self.cur_selected_i]);
           if(is_new)
           {
-            editor.name_editor.activate(0,self.selection_box_h);
+            editor_for_content(self.edit_type).name_editor.activate(0,self.selection_box_h);
             calculateCacheState();
           }
-
-          self.cur_title = "";
         }
       }
     }
@@ -1021,7 +1756,6 @@ var content_editor = function()
     self.editable_list.hovering_i = 0;
   };
 
-  self.cur_title = "Edit:";
   self.cur_selected_i = 0;
 
   self.domain_editor = new domain_editor(self);
@@ -1032,7 +1766,6 @@ var content_editor = function()
     {
       self.cur_selected_i = 0;
       self.edit_mode = EDIT_MODE_ENUM_LIST;
-      self.cur_title = "Domains:";
 
       self.domain_editor.hovering_i = 0;
       self.domain_editor.selected_i = 0;
@@ -1048,7 +1781,6 @@ var content_editor = function()
     {
       self.cur_selected_i = 0;
       self.edit_mode = EDIT_MODE_ENUM_LIST;
-      self.cur_title = "Groups:";
 
       self.group_editor.hovering_i = 0;
       self.group_editor.selected_i = 0;
@@ -1064,7 +1796,6 @@ var content_editor = function()
     {
       self.cur_selected_i = 0;
       self.edit_mode = EDIT_MODE_ENUM_LIST;
-      self.cur_title = "Objects:";
 
       self.object_editor.hovering_i = 0;
       self.object_editor.selected_i = 0;
@@ -1088,21 +1819,13 @@ var content_editor = function()
     switch(self.edit_mode)
     {
       case EDIT_MODE_ENUM_LIST:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_NONE:   self.editable_list.hover(contents,0,0,0,evt); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.hover(domains, 1,1,1,evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.hover(groups,  1,1,1,evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.hover(objects, 1,1,1,evt); break;
-        }
+        if(self.edit_type == CONTENT_ENUM_NONE)
+          self.editable_list.hover(contents,0,0,0,evt);
+        else
+          self.editable_list.hover(list_for_content(self.edit_type),1,1,1,evt);
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_DOMAIN: self.domain_editor.hover(domains[self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_GROUP:  self.group_editor.hover(groups[  self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_OBJECT: self.object_editor.hover(objects[self.cur_selected_i],evt); break;
-        }
+        editor_for_content(self.edit_type).hover(list_for_content(self.edit_type)[self.cur_selected_i],evt);
         break;
     }
   }
@@ -1117,21 +1840,13 @@ var content_editor = function()
     switch(self.edit_mode)
     {
       case EDIT_MODE_ENUM_LIST:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_NONE:   self.editable_list.click(contents,0,0,0,evt); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.click(domains, 1,1,1,evt); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.click(groups,  1,1,1,evt); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.click(objects, 1,1,1,evt); break;
-        }
+        if(self.edit_type == CONTENT_ENUM_NONE)
+          self.editable_list.click(contents,0,0,0,evt);
+        else
+          self.editable_list.click(list_for_content(self.edit_type),1,1,1,evt);
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_DOMAIN: self.domain_editor.click(domains[self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_GROUP:  self.group_editor.click(groups[  self.cur_selected_i],evt); break;
-          case CONTENT_ENUM_OBJECT: self.object_editor.click(objects[self.cur_selected_i],evt); break;
-        }
+        editor_for_content(self.edit_type).click(list_for_content(self.edit_type)[self.cur_selected_i],evt)
         break;
     }
   }
@@ -1148,21 +1863,13 @@ var content_editor = function()
     switch(self.edit_mode)
     {
       case EDIT_MODE_ENUM_LIST:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_NONE:   self.editable_list.draw(contents,self.cur_title,0,0,0,ctx); break;
-          case CONTENT_ENUM_DOMAIN: self.editable_list.draw(domains, self.cur_title,1,1,1,ctx); break;
-          case CONTENT_ENUM_GROUP:  self.editable_list.draw(groups,  self.cur_title,1,1,1,ctx); break;
-          case CONTENT_ENUM_OBJECT: self.editable_list.draw(objects, self.cur_title,1,1,1,ctx); break;
-        }
+        if(self.edit_type == CONTENT_ENUM_NONE)
+          self.editable_list.draw(contents,"Edit:",0,0,0,ctx);
+        else
+          self.editable_list.draw(list_for_content(self.edit_type),title_for_content(self.edit_type),1,1,1,ctx);
         break;
       case EDIT_MODE_ENUM_INDIVIDUAL:
-        switch(self.edit_type)
-        {
-          case CONTENT_ENUM_DOMAIN: self.domain_editor.draw(domains[self.cur_selected_i],ctx); break;
-          case CONTENT_ENUM_GROUP:  self.group_editor.draw(groups[  self.cur_selected_i],ctx); break;
-          case CONTENT_ENUM_OBJECT: self.object_editor.draw(objects[self.cur_selected_i],ctx); break;
-        }
+        editor_for_content(self.edit_type).draw(list_for_content(self.edit_type)[self.cur_selected_i],ctx);
         break;
     }
   }

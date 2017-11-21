@@ -8,6 +8,22 @@ var group_transitions;  var cur_group_transition_id;  var group_transitions_cach
 var object_transitions; var cur_object_transition_id; var object_transitions_cached_valid;
 var camera_targets;     var cur_camera_target_id;     var camera_targets_cached_valid;
 
+var list_for_content = function(type)
+{
+  switch(type)
+  {
+    case CONTENT_ENUM_DOMAIN:            return domains;            break;
+    case CONTENT_ENUM_GROUP:             return groups;             break;
+    case CONTENT_ENUM_OBJECT:            return objects;            break;
+    case CONTENT_ENUM_ANNOTATION:        return annotations;        break;
+    case CONTENT_ENUM_GROUP_ANNOTATION:  return group_annotations;  break;
+    case CONTENT_ENUM_OBJECT_ANNOTATION: return object_annotations; break;
+    case CONTENT_ENUM_GROUP_TRANSITION:  return group_transitions;  break;
+    case CONTENT_ENUM_OBJECT_TRANSITION: return object_transitions; break;
+    case CONTENT_ENUM_CAMERA_TARGET:     return camera_targets;     break;
+  }
+}
+
 var domain_groups_cached;
 var group_transitions_cached;
 var object_transitions_cached;
