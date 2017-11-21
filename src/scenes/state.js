@@ -1,12 +1,14 @@
-var domains;            var cur_domain_id;            var domains_valid;
-var groups;             var cur_group_id;             var groups_valid;
-var objects;            var cur_object_id;            var objects_valid;
-var annotations;        var cur_annotation_id;        var annotations_valid;
-var group_annotations;  var cur_group_annotation_id;  var group_annotations_valid;
-var object_annotations; var cur_object_annotation_id; var object_annotations_valid;
-var group_transitions;  var cur_group_transition_id;  var group_transitions_valid;
-var object_transitions; var cur_object_transition_id; var object_transitions_valid;
-var camera_targets;     var cur_camera_target_id;     var camera_targets_valid;
+var domains;            var cur_domain_id;            var domains_cached_valid;
+var groups;             var cur_group_id;             var groups_cached_valid;
+var objects;            var cur_object_id;            var objects_cached_valid;
+var annotations;        var cur_annotation_id;        var annotations_cached_valid;
+var group_annotations;  var cur_group_annotation_id;  var group_annotations_cached_valid;
+var object_annotations; var cur_object_annotation_id; var object_annotations_cached_valid;
+var group_transitions;  var cur_group_transition_id;  var group_transitions_cached_valid;
+var object_transitions; var cur_object_transition_id; var object_transitions_cached_valid;
+var camera_targets;     var cur_camera_target_id;     var camera_targets_cached_valid;
+
+var domain_groups_cached;
 
 //cache state
 var spacial_domain;
@@ -22,8 +24,6 @@ var spacial_y_breadth;
 var temporal_min;
 var temporal_max;
 var temporal_breadth;
-
-var content_lists;
 
 var resetState = function()
 {
@@ -82,11 +82,6 @@ var defaultState = function()
 
 var calculateCacheState = function()
 {
-  content_lists = [];
-  content_lists[CONTENT_ENUM_DOMAIN] = domains;
-  content_lists[CONTENT_ENUM_GROUP]  = groups;
-  content_lists[CONTENT_ENUM_OBJECT] = objects;
-
   spacial_domain  = 0;
   temporal_domain = 0;
   for(var i = 0; i < domains.length; i++)
@@ -147,73 +142,84 @@ var calculateCacheState = function()
     temporal_breadth = temporal_max-temporal_min;
   }
 
-  domains_valid = 1;
+  domains_cached_valid = 1;
   for(var i = 1; i < domains.length; i++)
   {
-    domains[i].valid = 1;
-    if(!domains[i].name || domains[i].name == "") domains[i].valid = 0;
-    if(!domains[i].valid) domains_valid = 0;
+    domains[i].cached_valid = 1;
+    if(!domains[i].name || domains[i].name == "") domains[i].cached_valid = 0;
+    if(!domains[i].cached_valid) domains_cached_valid = 0;
   }
-  groups_valid = 1;
+  groups_cached_valid = 1;
   for(var i = 1; i < groups.length; i++)
   {
-    groups[i].valid = 1;
-    if(!groups[i].name || groups[i].name == "") groups[i].valid = 0;
-    if(groups[i].domain == 0) groups[i].valid = 0;
-    if(!domains[i].valid) groups_valid = 0;
+    groups[i].cached_valid = 1;
+    if(!groups[i].name || groups[i].name == "") groups[i].cached_valid = 0;
+    if(groups[i].domain == 0) groups[i].cached_valid = 0;
+    if(!domains[i].cached_valid) groups_cached_valid = 0;
   }
-  objects_valid = 1;
+  objects_cached_valid = 1;
   for(var i = 1; i < objects.length; i++)
   {
-    objects[i].valid = 1;
-    if(!objects[i].name || objects[i].name == "") objects[i].valid = 0;
-    if(!domains[i].valid) objects_valid = 0;
+    objects[i].cached_valid = 1;
+    if(!objects[i].name || objects[i].name == "") objects[i].cached_valid = 0;
+    if(!domains[i].cached_valid) objects_cached_valid = 0;
   }
-  annotations_valid = 1;
+  annotations_cached_valid = 1;
   for(var i = 1; i < annotations.length; i++)
   {
-    annotations[i].valid = 1;
-    if(!annotations[i].name || annotations[i].name == "") annotations[i].valid = 0;
-    if(!domains[i].valid) annotations_valid = 0;
+    annotations[i].cached_valid = 1;
+    if(!annotations[i].name || annotations[i].name == "") annotations[i].cached_valid = 0;
+    if(!domains[i].cached_valid) annotations_cached_valid = 0;
   }
-  group_annotations_valid = 1;
+  group_annotations_cached_valid = 1;
   for(var i = 1; i < group_annotations.length; i++)
   {
-    group_annotations[i].valid = 1;
-    if(!group_annotations[i].name || group_annotations[i].name == "") group_annotations[i].valid = 0;
-    if(group_annotations[i].group == 0) group_annotations[i].valid = 0;
-    if(!domains[i].valid) group_annotations_valid = 0;
+    group_annotations[i].cached_valid = 1;
+    if(!group_annotations[i].name || group_annotations[i].name == "") group_annotations[i].cached_valid = 0;
+    if(group_annotations[i].group == 0) group_annotations[i].cached_valid = 0;
+    if(!domains[i].cached_valid) group_annotations_cached_valid = 0;
   }
-  object_annotations_valid = 1;
+  object_annotations_cached_valid = 1;
   for(var i = 1; i < object_annotations.length; i++)
   {
-    object_annotations[i].valid = 1;
-    if(!object_annotations[i].name || object_annotations[i].name == "") object_annotations[i].valid = 0;
-    if(object_annotations[i].object == 0) object_annotations[i].valid = 0;
-    if(!domains[i].valid) object_annotations_valid = 0;
+    object_annotations[i].cached_valid = 1;
+    if(!object_annotations[i].name || object_annotations[i].name == "") object_annotations[i].cached_valid = 0;
+    if(object_annotations[i].object == 0) object_annotations[i].cached_valid = 0;
+    if(!domains[i].cached_valid) object_annotations_cached_valid = 0;
   }
-  group_transitions_valid = 1;
+  group_transitions_cached_valid = 1;
   for(var i = 1; i < group_transitions.length; i++)
   {
-    group_transitions[i].valid = 1;
-    //if(!group_transitions[i].name || group_transitions[i].name == "") group_transitions[i].valid = 0;
-    if(group_transitions[i].group == 0) group_transitions[i].valid = 0;
-    if(!domains[i].valid) group_transitions_valid = 0;
+    group_transitions[i].cached_valid = 1;
+    //if(!group_transitions[i].name || group_transitions[i].name == "") group_transitions[i].cached_valid = 0;
+    if(group_transitions[i].group == 0) group_transitions[i].cached_valid = 0;
+    if(!domains[i].cached_valid) group_transitions_cached_valid = 0;
   }
-  object_transitions_valid = 1;
+  object_transitions_cached_valid = 1;
   for(var i = 1; i < object_transitions.length; i++)
   {
-    object_transitions[i].valid = 1;
-    //if(!object_transitions[i].name || object_transitions[i].name == "") object_transitions[i].valid = 0;
-    if(object_transitions[i].object == 0) object_transitions[i].valid = 0;
-    if(object_transitions[i].group == 0) object_transitions[i].valid = 0;
-    if(!domains[i].valid) object_transitions_valid = 0;
+    object_transitions[i].cached_valid = 1;
+    //if(!object_transitions[i].name || object_transitions[i].name == "") object_transitions[i].cached_valid = 0;
+    if(object_transitions[i].object == 0) object_transitions[i].cached_valid = 0;
+    if(object_transitions[i].group == 0) object_transitions[i].cached_valid = 0;
+    if(!domains[i].cached_valid) object_transitions_cached_valid = 0;
   }
-  camera_targets_valid = 1;
+  camera_targets_cached_valid = 1;
   for(var i = 1; i < camera_targets.length; i++)
   {
-    camera_targets[i].valid = 1;
-    if(!domains[i].valid) camera_targets_valid = 0;
+    camera_targets[i].cached_valid = 1;
+    if(!domains[i].cached_valid) camera_targets_cached_valid = 0;
+  }
+
+  domain_groups_cached = [];
+  for(var i = 0; i < domains.length; i++)
+  {
+    domain_groups_cached[i] = [];
+    for(var j = 0; j < groups.length; j++)
+    {
+      if(groups[j].domain == i)
+        domain_groups_cached[i].push(groups[j]);
+    }
   }
 
 }

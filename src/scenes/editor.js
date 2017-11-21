@@ -453,30 +453,30 @@ var domain_editor = function(editor)
   self.set_domain = function(domain)
   {
     self.domain = domain;
-    self.editable_name.set_val(        self.domain.name);
-    self.editable_mutex.set_val(       self.domain.mutex);
-    self.editable_directed.set_val(    self.domain.directed);
-    self.editable_t_one_to_one.set_val(self.domain.t_one_to_one);
-    self.editable_viz.set_val(         self.domain.viz);
+    self.name_editor.set_val(        self.domain.name);
+    self.mutex_editor.set_val(       self.domain.mutex);
+    self.directed_editor.set_val(    self.domain.directed);
+    self.t_one_to_one_editor.set_val(self.domain.t_one_to_one);
+    self.viz_editor.set_val(         self.domain.viz);
   }
 
-  self.editable_name                 = new editable_text(editor);
-  self.editable_name.changed         = function() { self.domain.name         = self.editable_name.val;     };
-  self.editable_mutex                = new editable_toggle(editor);
-  self.editable_mutex.changed        = function() { self.domain.mutex        = self.editable_mutex.val;    };
-  self.editable_directed             = new editable_toggle(editor);
-  self.editable_directed.changed     = function() { self.domain.directed     = self.editable_directed.val; };
-  self.editable_t_one_to_one         = new editable_toggle(editor);
-  self.editable_t_one_to_one.changed = function() { self.domain.t_one_to_one = self.editable_t_one_to_one.val; };
-  self.editable_viz                  = new editable_viz(editor);
-  self.editable_viz.changed          = function() { self.domain.viz          = self.editable_viz.val;      };
+  self.name_editor                 = new editable_text(editor);
+  self.mutex_editor                = new editable_toggle(editor);
+  self.directed_editor             = new editable_toggle(editor);
+  self.t_one_to_one_editor         = new editable_toggle(editor);
+  self.viz_editor                  = new editable_viz(editor);
+  self.name_editor.changed         = function() { self.domain.name         = self.name_editor.val;         calculateCacheState();};
+  self.mutex_editor.changed        = function() { self.domain.mutex        = self.mutex_editor.val;        calculateCacheState();};
+  self.directed_editor.changed     = function() { self.domain.directed     = self.directed_editor.val;     calculateCacheState();};
+  self.t_one_to_one_editor.changed = function() { self.domain.t_one_to_one = self.t_one_to_one_editor.val; calculateCacheState();};
+  self.viz_editor.changed          = function() { self.domain.viz          = self.viz_editor.val;          calculateCacheState();};
 
   self.properties = [];
-  self.properties.push(self.editable_name);
-  self.properties.push(self.editable_mutex);
-  self.properties.push(self.editable_directed);
-  self.properties.push(self.editable_t_one_to_one);
-  self.properties.push(self.editable_viz);
+  self.properties.push(self.name_editor);
+  self.properties.push(self.mutex_editor);
+  self.properties.push(self.directed_editor);
+  self.properties.push(self.t_one_to_one_editor);
+  self.properties.push(self.viz_editor);
 
   self.hover = function(domain,evt)
   {
@@ -577,38 +577,38 @@ var group_editor = function(editor)
   self.set_group = function(group)
   {
     self.group = group;
-    self.editable_name.set_val(  self.group.name);
-    self.editable_domain.set_val(self.group.domain);
-    self.editable_seq.set_val(   self.group.seq);
-    self.editable_color.set_val( self.group.color);
-    self.editable_img.set_val(   self.group.img);
-    self.editable_wx.set_val(    self.group.wx);
-    self.editable_wy.set_val(    self.group.wy);
+    self.name_editor.set_val(  self.group.name);
+    self.domain_editor.set_val(self.group.domain);
+    self.seq_editor.set_val(   self.group.seq);
+    self.color_editor.set_val( self.group.color);
+    self.img_editor.set_val(   self.group.img);
+    self.wx_editor.set_val(    self.group.wx);
+    self.wy_editor.set_val(    self.group.wy);
   }
 
-  self.editable_name           = new editable_text(editor);
-  self.editable_name.changed   = function() { self.group.name   = self.editable_name.val;     };
-  self.editable_domain         = new editable_domain(editor);
-  self.editable_domain.changed = function() { self.group.domain = self.editable_domain.val;    };
-  self.editable_seq            = new editable_int(editor);
-  self.editable_seq.changed    = function() { self.group.seq    = self.editable_seq.val;    };
-  self.editable_color          = new editable_color(editor);
-  self.editable_color.changed  = function() { self.group.color  = self.editable_color.val;    };
-  self.editable_img            = new editable_img(editor);
-  self.editable_img.changed    = function() { self.group.img    = self.editable_img.val;    };
-  self.editable_wx             = new editable_float(editor);
-  self.editable_wx.changed     = function() { self.group.wx     = self.editable_wx.val;    };
-  self.editable_wy             = new editable_float(editor);
-  self.editable_wy.changed     = function() { self.group.wy     = self.editable_wy.val;    };
+  self.name_editor           = new editable_text(editor);
+  self.domain_editor         = new editable_domain(editor);
+  self.seq_editor            = new editable_int(editor);
+  self.color_editor          = new editable_color(editor);
+  self.img_editor            = new editable_img(editor);
+  self.wx_editor             = new editable_float(editor);
+  self.wy_editor             = new editable_float(editor);
+  self.name_editor.changed   = function() { self.group.name   = self.name_editor.val;   calculateCacheState(); };
+  self.domain_editor.changed = function() { self.group.domain = self.domain_editor.val; calculateCacheState(); };
+  self.seq_editor.changed    = function() { self.group.seq    = self.seq_editor.val;    calculateCacheState(); };
+  self.color_editor.changed  = function() { self.group.color  = self.color_editor.val;  calculateCacheState(); };
+  self.img_editor.changed    = function() { self.group.img    = self.img_editor.val;    calculateCacheState(); };
+  self.wx_editor.changed     = function() { self.group.wx     = self.wx_editor.val;     calculateCacheState(); };
+  self.wy_editor.changed     = function() { self.group.wy     = self.wy_editor.val;     calculateCacheState(); };
 
   self.properties = [];
-  self.properties.push(self.editable_name);
-  self.properties.push(self.editable_domain);
-  self.properties.push(self.editable_seq);
-  self.properties.push(self.editable_color);
-  self.properties.push(self.editable_img);
-  self.properties.push(self.editable_wx);
-  self.properties.push(self.editable_wy);
+  self.properties.push(self.name_editor);
+  self.properties.push(self.domain_editor);
+  self.properties.push(self.seq_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
+  self.properties.push(self.wx_editor);
+  self.properties.push(self.wy_editor);
 
   self.hover = function(group,evt)
   {
@@ -709,22 +709,22 @@ var object_editor = function(editor)
   self.set_object = function(object)
   {
     self.object = object;
-    self.editable_name.set_val( self.object.name);
-    self.editable_color.set_val(self.object.color);
-    self.editable_img.set_val(  self.object.img);
+    self.name_editor.set_val( self.object.name);
+    self.color_editor.set_val(self.object.color);
+    self.img_editor.set_val(  self.object.img);
   }
 
-  self.editable_name          = new editable_text(editor);
-  self.editable_name.changed  = function() { self.object.name  = self.editable_name.val;  };
-  self.editable_color         = new editable_color(editor);
-  self.editable_color.changed = function() { self.object.color = self.editable_color.val; };
-  self.editable_img           = new editable_img(editor);
-  self.editable_img.changed   = function() { self.object.img   = self.editable_img.val;   };
+  self.name_editor          = new editable_text(editor);
+  self.color_editor         = new editable_color(editor);
+  self.img_editor           = new editable_img(editor);
+  self.name_editor.changed  = function() { self.object.name  = self.name_editor.val;  calculateCacheState(); };
+  self.color_editor.changed = function() { self.object.color = self.color_editor.val; calculateCacheState(); };
+  self.img_editor.changed   = function() { self.object.img   = self.img_editor.val;   calculateCacheState(); };
 
   self.properties = [];
-  self.properties.push(self.editable_name);
-  self.properties.push(self.editable_color);
-  self.properties.push(self.editable_img);
+  self.properties.push(self.name_editor);
+  self.properties.push(self.color_editor);
+  self.properties.push(self.img_editor);
 
   self.hover = function(object,evt)
   {
@@ -932,8 +932,7 @@ var editable_list = function(editor)
 
 }
 
-
-var content_editor = function(editor)
+var content_editor = function()
 {
   var self = this;
   init_dom();
@@ -996,14 +995,22 @@ var content_editor = function(editor)
         }
 
         var is_new = 0;
-        if(del && i != list.length) del(list[i]);
+        if(del && i != list.length)
+        {
+          del(list[i]);
+          calculateCacheState();
+        }
         else
         {
           if(i == list.length) { gen(); is_new = 1; }
           self.cur_selected_i = i;
           self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
           edset(list[self.cur_selected_i]);
-          if(is_new) editor.editable_name.activate(0,self.selection_box_h);
+          if(is_new)
+          {
+            editor.name_editor.activate(0,self.selection_box_h);
+            calculateCacheState();
+          }
 
           self.cur_title = "";
         }
@@ -1075,9 +1082,6 @@ var content_editor = function(editor)
   EDIT_MODE_ENUM_INDIVIDUAL = ENUM; ENUM++;
   EDIT_MODE_ENUM_COUNT      = ENUM; ENUM++;
   self.edit_mode = EDIT_MODE_ENUM_LIST;
-
-  ENUM = 0;
-  EDIT_PROPERTY_ENUM_NONE = ENUM; ENUM++;
 
   self.hover = function(evt)
   {
@@ -1160,6 +1164,93 @@ var content_editor = function(editor)
           case CONTENT_ENUM_OBJECT: self.object_editor.draw(objects[self.cur_selected_i],ctx); break;
         }
         break;
+    }
+  }
+
+}
+
+var timeline_editor = function()
+{
+  var self = this;
+  init_dom();
+
+  self.x = 0;
+  self.y = 0;
+  self.w = 0;
+  self.h = 0;
+
+  self.font_size = 20;
+  self.font_face = "Helvetica";
+  self.hover_bg_color = "#AAAAAA";
+
+  self.back_btn_w = 30;
+
+  self.selection_box_text_off_x = 5;
+  self.selection_box_text_off_y = self.font_size;
+  self.selection_box_h = self.font_size+5;
+
+  var old_h = self.h;
+  self.h = self.selection_box_h+
+  domains.length*self.selection_box_h+
+  groups.length*self.selection_box_h;
+  self.y -= self.h-old_h;
+
+  var ENUM;
+
+  self.hover = function(evt)
+  {
+  }
+
+  self.unhover = function(evt)
+  {
+  }
+
+  self.click = function(evt)
+  {
+  }
+
+  self.draw = function(ctx)
+  {
+    ctx.fillStyle = black;
+    ctx.strokeStyle = black;
+    ctx.font = self.font_size+"px "+self.font_face;
+    ctx.textAlign = "left";
+
+    var old_h = self.h;
+    self.h = self.selection_box_h+
+    domains.length*self.selection_box_h+
+    groups.length*self.selection_box_h;
+    self.y -= self.h-old_h;
+
+    strokeBox(self,ctx);
+
+    var off_y = 0;
+    var box_y;
+    var name;
+
+    box_y = self.y+off_y;
+    drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
+    ctx.fillText("+",self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+    off_y += self.selection_box_h;
+
+    for(var i = 0; i < domains.length; i++)
+    {
+      box_y = self.y+off_y;
+      drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
+      name = "(No Domain)";
+      if(domains[i].name && domains[i].name != "") name = domains[i].name;
+      ctx.fillText(name,self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+      off_y += self.selection_box_h;
+
+      for(var j = 0; j < domain_groups_cached[i].length; j++)
+      {
+        box_y = self.y+off_y;
+        drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
+        name = "(No Group)";
+        if(domain_groups_cached[i][j].name && domain_groups_cached[i][j].name != "") name = domain_groups_cached[i][j].name;
+        ctx.fillText(name,self.x+self.selection_box_h+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+        off_y += self.selection_box_h;
+      }
     }
   }
 
