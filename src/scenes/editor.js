@@ -324,6 +324,64 @@ var editable_toggle = function(editor)
 
 }
 
+var editable_direction = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = TRANSITION_DIRECTION_ENUM_NONE;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = "";
+    switch(self.val)
+    {
+      case TRANSITION_DIRECTION_ENUM_IN:  self.text = "In";  break;
+      case TRANSITION_DIRECTION_ENUM_OUT: self.text = "Out"; break;
+    }
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_drop.innerHTML =
+    "<option value=\""+TRANSITION_DIRECTION_ENUM_IN +"\">In</option>"+
+    "<option value=\""+TRANSITION_DIRECTION_ENUM_OUT+"\">Out</option>"
+    ;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
 var editable_viz = function(editor)
 {
   var self = this;
@@ -359,6 +417,134 @@ var editable_viz = function(editor)
     "<option value=\""+VIZ_ENUM_SPACIAL +"\">Spacial</option>"+
     "<option value=\""+VIZ_ENUM_TEMPORAL+"\">Temporal</option>"+
     "<option value=\""+VIZ_ENUM_TAG     +"\">Tag</option>"
+    ;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_transition = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = TRANSITION_ENUM_NONE;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = "";
+    switch(self.val)
+    {
+      case TRANSITION_ENUM_POP:       self.text = "Pop";       break;
+      case TRANSITION_ENUM_LERP:      self.text = "Lerp";      break;
+      case TRANSITION_ENUM_EASE_IN:   self.text = "Ease In";   break;
+      case TRANSITION_ENUM_EASE_OUT:  self.text = "Ease Out";  break;
+      case TRANSITION_ENUM_EASE_BOTH: self.text = "Ease Both"; break;
+      case TRANSITION_ENUM_FADE:      self.text = "Fade";      break;
+      case TRANSITION_ENUM_BOUNCE:    self.text = "Bounce";    break;
+    }
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_drop.innerHTML =
+    "<option value=\""+TRANSITION_ENUM_POP      +"\">Pop</option>"+
+    "<option value=\""+TRANSITION_ENUM_LERP     +"\">Lerp</option>"+
+    "<option value=\""+TRANSITION_ENUM_EASE_IN  +"\">Ease In</option>"+
+    "<option value=\""+TRANSITION_ENUM_EASE_OUT +"\">Ease Out</option>"+
+    "<option value=\""+TRANSITION_ENUM_EASE_BOTH+"\">Ease Both</option>"+
+    "<option value=\""+TRANSITION_ENUM_FADE     +"\">Fade</option>"+
+    "<option value=\""+TRANSITION_ENUM_BOUNCE   +"\">Bounce</option>"
+    ;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_target = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = TARGET_ENUM_NONE;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = "";
+    switch(self.val)
+    {
+      case TARGET_ENUM_ASPECT_FIT:  self.text = "Aspect Fit";  break;
+      case TARGET_ENUM_ASPECT_FILL: self.text = "Aspect Fill"; break;
+      case TARGET_ENUM_STRETCH:     self.text = "Stretch";     break;
+    }
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    dom_drop.innerHTML =
+    "<option value=\""+VIZ_ENUM_ASPECT_FIT +"\">Aspect Fit</option>"+
+    "<option value=\""+VIZ_ENUM_ASPECT_FILL+"\">Aspect Fill</option>"+
+    "<option value=\""+VIZ_ENUM_STRETCH    +"\">Stretch</option>"
     ;
     dom_drop.value = self.val;
     dom_drop.style.display = "block";
@@ -1059,7 +1245,7 @@ var group_annotation_editor = function(editor)
   }
 
   self.name_editor  = new editable_text(editor);
-  self.group_editor = new editable_int(editor);
+  self.group_editor = new editable_group(editor);
   self.t_editor     = new editable_int(editor);
   self.color_editor = new editable_color(editor);
   self.img_editor   = new editable_img(editor);
@@ -1183,7 +1369,7 @@ var object_annotation_editor = function(editor)
   }
 
   self.name_editor   = new editable_text(editor);
-  self.object_editor = new editable_int(editor);
+  self.object_editor = new editable_object(editor);
   self.t_editor      = new editable_int(editor);
   self.color_editor  = new editable_color(editor);
   self.img_editor    = new editable_img(editor);
@@ -1308,9 +1494,9 @@ var group_transition_editor = function(editor)
 
   self.name_editor       = new editable_text(editor);
   self.group_editor      = new editable_group(editor);
-  self.direction_editor  = new editable_int(editor);
+  self.direction_editor  = new editable_direction(editor);
   self.t_editor          = new editable_int(editor);
-  self.transition_editor = new editable_int(editor);
+  self.transition_editor = new editable_transition(editor);
   self.name_editor.changed       = function() { self.group_transition.name       = self.name_editor.val;       calculateCacheState(); };
   self.group_editor.changed      = function() { self.group_transition.group      = self.group_editor.val;      calculateCacheState(); };
   self.direction_editor.changed  = function() { self.group_transition.direction  = self.direction_editor.val;  calculateCacheState(); };
@@ -1434,9 +1620,9 @@ var object_transition_editor = function(editor)
   self.name_editor       = new editable_text(editor);
   self.object_editor     = new editable_object(editor);
   self.group_editor      = new editable_group(editor);
-  self.direction_editor  = new editable_int(editor);
+  self.direction_editor  = new editable_direction(editor);
   self.t_editor          = new editable_int(editor);
-  self.transition_editor = new editable_int(editor);
+  self.transition_editor = new editable_transition(editor);
   self.name_editor.changed       = function() { self.object_transition.name       = self.name_editor.val;       calculateCacheState(); };
   self.object_editor.changed     = function() { self.object_transition.object     = self.object_editor.val;     calculateCacheState(); };
   self.group_editor.changed      = function() { self.object_transition.group      = self.group_editor.val;      calculateCacheState(); };
@@ -1568,7 +1754,7 @@ var camera_target_editor = function(editor)
   self.wh_editor         = new editable_float(editor);
   self.t_editor          = new editable_int(editor);
   self.target_editor     = new editable_int(editor);
-  self.transition_editor = new editable_int(editor);
+  self.transition_editor = new editable_transition(editor);
   self.name_editor.changed       = function() { self.camera_target.name       = self.name_editor.val;       calculateCacheState(); };
   self.wx_editor.changed         = function() { self.camera_target.wx         = self.wx_editor.val;         calculateCacheState(); };
   self.wy_editor.changed         = function() { self.camera_target.wy         = self.wy_editor.val;         calculateCacheState(); };
