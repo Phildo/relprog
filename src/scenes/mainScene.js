@@ -47,7 +47,7 @@ var MainScene = function(doodle, stage)
   {
     defaultState();
     c_editor = new content_editor();
-    t_editor = new timeline_editor();
+    t_editor = new timeline_editor(c_editor);
 
     self.resize(stage);
   };

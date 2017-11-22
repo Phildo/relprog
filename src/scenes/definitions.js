@@ -48,6 +48,7 @@ var domain = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.name = "";
   self.mutex = 1;
   self.directed = 0;
@@ -60,6 +61,7 @@ var group = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.domain = 0;
   self.seq = 0;
   self.name = "";
@@ -74,6 +76,7 @@ var object = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.name = "";
   self.color = 0;
   self.img = 0;
@@ -84,6 +87,7 @@ var annotation = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.name = "";
   self.t = 0;
   self.color = 0;
@@ -95,6 +99,7 @@ var group_annotation = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.group = 0;
   self.name = "";
   self.t = 0;
@@ -107,6 +112,7 @@ var object_annotation = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.object = 0;
   self.name = "";
   self.t = 0;
@@ -119,6 +125,7 @@ var group_transition = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.group = 0;
   self.direction = TRANSITION_DIRECTION_ENUM_NONE;
   self.name = "";
@@ -131,6 +138,7 @@ var object_transition = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.object = 0;
   self.group = 0;
   self.direction = TRANSITION_DIRECTION_ENUM_NONE;
@@ -144,6 +152,7 @@ var camera_target = function()
 {
   var self = this;
   self.id = 0;
+  self.cached_i = 0;
   self.wx = 0;
   self.wy = 0;
   self.ww = 1;

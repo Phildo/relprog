@@ -104,6 +104,16 @@ var defaultState = function()
 
 var calculateCacheState = function()
 {
+  for(var i = 0; i < domains.length;            i++) domains[i].cached_i            = i;
+  for(var i = 0; i < groups.length;             i++) groups[i].cached_i             = i;
+  for(var i = 0; i < objects.length;            i++) objects[i].cached_i            = i;
+  for(var i = 0; i < annotations.length;        i++) annotations[i].cached_i        = i;
+  for(var i = 0; i < group_annotations.length;  i++) group_annotations[i].cached_i  = i;
+  for(var i = 0; i < object_annotations.length; i++) object_annotations[i].cached_i = i;
+  for(var i = 0; i < group_transitions.length;  i++) group_transitions[i].cached_i  = i;
+  for(var i = 0; i < object_transitions.length; i++) object_transitions[i].cached_i = i;
+  for(var i = 0; i < camera_targets.length;     i++) camera_targets[i].cached_i     = i;
+
   spacial_domain  = 0;
   temporal_domain = 0;
   for(var i = 0; i < domains.length; i++)

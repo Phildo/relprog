@@ -1862,6 +1862,19 @@ var content_editor = function()
     }
   }
 
+  self.edit_content = function(type,i)
+  {
+    self.edit_type = type;
+    self.cur_selected_i = i;
+    self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
+    var o = list_for_content(self.edit_type)[i];
+    edset_for_content(self.edit_type)(o);
+    if(!o.name || o.name == "")
+    {
+      editor_for_content(self.edit_type).name_editor.activate(0,self.selection_box_h);
+    }
+  }
+
   var contents = []; //hacked "list" for selector selector
   for(var i = 0; i < CONTENT_ENUM_COUNT; i++)
     contents.push({name:title_for_content(i)});
@@ -1870,7 +1883,7 @@ var content_editor = function()
   self.editable_list.hovered = function(i,del){};//ignore
   self.editable_list.selected = function(i,del)
   {
-    if(i == -1)
+    if(i == -1) //back
     {
       switch(self.edit_type)
       {
@@ -1906,14 +1919,8 @@ var content_editor = function()
         else
         {
           if(i == list.length) { gen_for_content(self.edit_type)(); is_new = 1; }
-          self.cur_selected_i = i;
-          self.edit_mode = EDIT_MODE_ENUM_INDIVIDUAL;
-          edset_for_content(self.edit_type)(list[self.cur_selected_i]);
-          if(is_new)
-          {
-            editor_for_content(self.edit_type).name_editor.activate(0,self.selection_box_h);
-            calculateCacheState();
-          }
+          self.edit_content(self.edit_type,i);
+          if(is_new) calculateCacheState();
         }
       }
     }
@@ -2132,7 +2139,7 @@ var content_editor = function()
 
 }
 
-var timeline_editor = function()
+var timeline_editor = function(editor)
 {
   var self = this;
   init_dom();
@@ -2152,18 +2159,126 @@ var timeline_editor = function()
   self.selection_box_text_off_y = self.font_size;
   self.selection_box_h = self.font_size+5;
 
+  self.visible_t = 1;
+  self.hovering_i = -1;
+  self.selected_i = -1;
+
   var ENUM;
+
+  self.hovered = function(i){}; //for self use- not currently necessary
 
   self.hover = function(evt)
   {
+    var old_hovering_i = self.hovering_i;
+    self.hovering_i = -1;
+    var hover_test = 0;
+
+    var off_y = 0;
+    var box_y;
+
+    //add domain
+    box_y = self.y+off_y;
+    if(fWithin(box_y,box_y+self.selection_box_h,evt.doY)) self.hovering_i = hover_test;
+    hover_test++;
+    off_y += self.selection_box_h;
+
+    for(var i = 0; i < domains.length; i++)
+    {
+      //domain
+      box_y = self.y+off_y;
+      if(fWithin(box_y,box_y+self.selection_box_h,evt.doY)) self.hovering_i = hover_test;
+      hover_test++;
+      off_y += self.selection_box_h;
+
+      if(i > 0)
+      {
+        //add group to domain
+        box_y = self.y+off_y;
+        if(fWithin(box_y,box_y+self.selection_box_h,evt.doY)) self.hovering_i = hover_test;
+        hover_test++;
+        off_y += self.selection_box_h;
+      }
+
+      for(var j = 0; j < domain_groups_cached[i].length; j++)
+      {
+        //group
+        box_y = self.y+off_y;
+        if(fWithin(box_y,box_y+self.selection_box_h,evt.doY)) self.hovering_i = hover_test;
+        hover_test++;
+        off_y += self.selection_box_h;
+      }
+    }
+
+    if(self.hovering_i != old_hovering_i) self.hovered(self.hovering_i);
   }
 
   self.unhover = function(evt)
   {
+    self.hovering_i = -1;
   }
 
   self.click = function(evt)
   {
+    if(self.hovering_i == -1) return;
+
+    var hover_test = 0; //to match with self.hovering
+
+    var off_y = 0;
+    var box_y;
+
+    //add domain
+    box_y = self.y+off_y;
+    if(self.hovering_i == hover_test)
+    {
+      ndomain();
+      editor.edit_content(CONTENT_ENUM_DOMAIN,domains.length-1);
+      calculateCacheState();
+    }
+    hover_test++;
+    off_y += self.selection_box_h;
+
+    for(var i = 0; i < domains.length; i++)
+    {
+      //domain
+      box_y = self.y+off_y;
+      if(self.hovering_i == hover_test)
+      {
+        if(domains[i].id != 0) editor.edit_content(CONTENT_ENUM_DOMAIN,i);
+      }
+      hover_test++;
+      off_y += self.selection_box_h;
+
+      if(i > 0)
+      {
+        //add group to domain
+        box_y = self.y+off_y;
+        if(self.hovering_i == hover_test)
+        {
+          if(domains[i].id != 0)
+          {
+            var g = ngroup();
+            g.domain = domains[i].id;
+            editor.edit_content(CONTENT_ENUM_GROUP,groups.length-1);
+            calculateCacheState();
+          }
+        }
+        hover_test++;
+        off_y += self.selection_box_h;
+      }
+
+      for(var j = 0; j < domain_groups_cached[i].length; j++)
+      {
+        //domain group
+        box_y = self.y+off_y;
+        if(self.hovering_i == hover_test)
+        {
+          var g = groups[domain_groups_cached[i][j].cached_i];
+          if(g.id != 0) editor.edit_content(CONTENT_ENUM_GROUP,g.cached_i);
+        }
+        hover_test++;
+        off_y += self.selection_box_h;
+      }
+    }
   }
 
   self.draw = function(ctx)
@@ -2172,6 +2287,8 @@ var timeline_editor = function()
     ctx.strokeStyle = black;
     ctx.font = self.font_size+"px "+self.font_face;
     ctx.textAlign = "left";
+
+    var hover_test = 0; //to match with self.hovering
 
     var old_h = self.h;
     self.h = self.selection_box_h+
@@ -2185,31 +2302,66 @@ var timeline_editor = function()
     var box_y;
     var name;
 
+    //add domain
     box_y = self.y+off_y;
+    if(self.hovering_i == hover_test)
+    {
+      var oldStyle = ctx.fillStyle;
+      ctx.fillStyle = self.hover_bg_color;
+      ctx.fillRect(self.x,box_y,self.w,self.selection_box_h);
+      ctx.fillStyle = oldStyle;
+    }
     drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
     ctx.fillText("+",self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+    hover_test++;
     off_y += self.selection_box_h;
 
     for(var i = 0; i < domains.length; i++)
     {
+      //domain
       box_y = self.y+off_y;
+      if(self.hovering_i == hover_test)
+      {
+        var oldStyle = ctx.fillStyle;
+        ctx.fillStyle = self.hover_bg_color;
+        ctx.fillRect(self.x,box_y,self.w,self.selection_box_h);
+        ctx.fillStyle = oldStyle;
+      }
       drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
       name = "(No Domain)";
       if(domains[i].name && domains[i].name != "") name = domains[i].name;
       ctx.fillText(name,self.x+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+      hover_test++;
       off_y += self.selection_box_h;
 
       if(i > 0)
       {
+        //add group to domain
         box_y = self.y+off_y;
+        if(self.hovering_i == hover_test)
+        {
+          var oldStyle = ctx.fillStyle;
+          ctx.fillStyle = self.hover_bg_color;
+          ctx.fillRect(self.x,box_y,self.w,self.selection_box_h);
+          ctx.fillStyle = oldStyle;
+        }
         drawLine(self.x,box_y+self.selection_box_h,self.x+self.w,box_y+self.selection_box_h,ctx);
         ctx.fillText("+",self.x+self.selection_box_h+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+        hover_test++;
         off_y += self.selection_box_h;
       }
 
       for(var j = 0; j < domain_groups_cached[i].length; j++)
       {
+        //group
         box_y = self.y+off_y;
+        if(self.hovering_i == hover_test)
+        {
+          var oldStyle = ctx.fillStyle;
+          ctx.fillStyle = self.hover_bg_color;
+          ctx.fillRect(self.x,box_y,self.w,self.selection_box_h);
+          ctx.fillStyle = oldStyle;
+        }
 
         var group_i = 0;
         for(var k = 0; k < groups.length; k++)
@@ -2256,6 +2408,7 @@ var timeline_editor = function()
         name = "(No Group)";
         if(domain_groups_cached[i][j].name && domain_groups_cached[i][j].name != "") name = domain_groups_cached[i][j].name;
         ctx.fillText(name,self.x+self.selection_box_h+self.selection_box_text_off_x,box_y+self.selection_box_text_off_y);
+        hover_test++;
         off_y += self.selection_box_h;
       }
     }
