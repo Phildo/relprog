@@ -93,14 +93,14 @@ var editable_int = function(editor)
 {
   var self = this;
   self.text = "";
-  self.val = "";
+  self.val = 0;
 
   self.changed = function(){}; //overwrite
 
   self.listen_change = function()
   {
     var old_val = self.val;
-    self.set_val(dom_text.value);
+    self.set_val(parseInt(dom_text.value));
     if(self.val != old_val) self.changed();
   }
 
@@ -149,7 +149,7 @@ var editable_float = function(editor)
   self.listen_change = function()
   {
     var old_val = self.val;
-    self.set_val(dom_text.value);
+    self.set_val(parseFloat(dom_text.value));
     if(self.val != old_val) self.changed();
   }
 
@@ -412,6 +412,112 @@ var editable_domain = function(editor)
     var html = "";
     for(var i = 1; i < domains.length; i++)
       html += "<option value=\""+i+"\">"+domains[i].name+"</option>";
+    dom_drop.innerHTML = html;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_group = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = 0;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = groups[self.val].name;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    var html = "";
+    for(var i = 1; i < groups.length; i++)
+      html += "<option value=\""+i+"\">"+groups[i].name+"</option>";
+    dom_drop.innerHTML = html;
+    dom_drop.value = self.val;
+    dom_drop.style.display = "block";
+    dom_drop.style.left = editor.x+off_x+"px";
+    dom_drop.style.top  = editor.y+off_y+"px";
+    dom_drop_callback = self.listen_change;
+    dom_drop.focus();
+  }
+
+  self.deactivate = function()
+  {
+    dom_drop.style.display = "none";
+    dom_drop.value = 0;
+  }
+
+  self.hover = function(off_y,evt)
+  {
+
+  }
+
+  self.click = function(off_y,evt)
+  {
+
+  }
+
+}
+
+var editable_object = function(editor)
+{
+  var self = this;
+  self.text = "";
+  self.val = 0;
+
+  self.changed = function(){}; //overwrite
+
+  self.listen_change = function()
+  {
+    var old_val = self.val;
+    self.set_val(parseInt(dom_drop.value));
+    if(self.val != old_val) self.changed();
+  }
+
+  self.set_val = function(val)
+  {
+    self.val = val;
+    self.text = objects[self.val].name;
+  }
+
+  self.activate = function(off_x,off_y)
+  {
+    var html = "";
+    for(var i = 1; i < objects.length; i++)
+      html += "<option value=\""+i+"\">"+objects[i].name+"</option>";
     dom_drop.innerHTML = html;
     dom_drop.value = self.val;
     dom_drop.style.display = "block";
@@ -826,19 +932,23 @@ var annotation_editor = function(editor)
   {
     self.annotation = annotation;
     self.name_editor.set_val( self.annotation.name);
+    self.t_editor.set_val(    self.annotation.t);
     self.color_editor.set_val(self.annotation.color);
     self.img_editor.set_val(  self.annotation.img);
   }
 
   self.name_editor          = new editable_text(editor);
+  self.t_editor             = new editable_int(editor);
   self.color_editor         = new editable_color(editor);
   self.img_editor           = new editable_img(editor);
   self.name_editor.changed  = function() { self.annotation.name  = self.name_editor.val;  calculateCacheState(); };
+  self.t_editor.changed     = function() { self.annotation.t     = self.t_editor.val;     calculateCacheState(); };
   self.color_editor.changed = function() { self.annotation.color = self.color_editor.val; calculateCacheState(); };
   self.img_editor.changed   = function() { self.annotation.img   = self.img_editor.val;   calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
+  self.properties.push(self.t_editor);
   self.properties.push(self.color_editor);
   self.properties.push(self.img_editor);
 
@@ -942,19 +1052,27 @@ var group_annotation_editor = function(editor)
   {
     self.group_annotation = group_annotation;
     self.name_editor.set_val( self.group_annotation.name);
+    self.group_editor.set_val(self.group_annotation.group);
+    self.t_editor.set_val(    self.group_annotation.t);
     self.color_editor.set_val(self.group_annotation.color);
     self.img_editor.set_val(  self.group_annotation.img);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.color_editor         = new editable_color(editor);
-  self.img_editor           = new editable_img(editor);
+  self.name_editor  = new editable_text(editor);
+  self.group_editor = new editable_int(editor);
+  self.t_editor     = new editable_int(editor);
+  self.color_editor = new editable_color(editor);
+  self.img_editor   = new editable_img(editor);
   self.name_editor.changed  = function() { self.group_annotation.name  = self.name_editor.val;  calculateCacheState(); };
+  self.group_editor.changed = function() { self.group_annotation.group  = self.group_editor.val;  calculateCacheState(); };
+  self.t_editor.changed     = function() { self.group_annotation.t  = self.t_editor.val;  calculateCacheState(); };
   self.color_editor.changed = function() { self.group_annotation.color = self.color_editor.val; calculateCacheState(); };
   self.img_editor.changed   = function() { self.group_annotation.img   = self.img_editor.val;   calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
+  self.properties.push(self.group_editor);
+  self.properties.push(self.t_editor);
   self.properties.push(self.color_editor);
   self.properties.push(self.img_editor);
 
@@ -1057,20 +1175,28 @@ var object_annotation_editor = function(editor)
   self.set_object_annotation = function(object_annotation)
   {
     self.object_annotation = object_annotation;
-    self.name_editor.set_val( self.object_annotation.name);
-    self.color_editor.set_val(self.object_annotation.color);
-    self.img_editor.set_val(  self.object_annotation.img);
+    self.name_editor.set_val(  self.object_annotation.name);
+    self.object_editor.set_val(self.object_annotation.object);
+    self.t_editor.set_val(     self.object_annotation.t);
+    self.color_editor.set_val( self.object_annotation.color);
+    self.img_editor.set_val(   self.object_annotation.img);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.color_editor         = new editable_color(editor);
-  self.img_editor           = new editable_img(editor);
-  self.name_editor.changed  = function() { self.object_annotation.name  = self.name_editor.val;  calculateCacheState(); };
-  self.color_editor.changed = function() { self.object_annotation.color = self.color_editor.val; calculateCacheState(); };
-  self.img_editor.changed   = function() { self.object_annotation.img   = self.img_editor.val;   calculateCacheState(); };
+  self.name_editor   = new editable_text(editor);
+  self.object_editor = new editable_int(editor);
+  self.t_editor      = new editable_int(editor);
+  self.color_editor  = new editable_color(editor);
+  self.img_editor    = new editable_img(editor);
+  self.name_editor.changed   = function() { self.object_annotation.name   = self.name_editor.val;   calculateCacheState(); };
+  self.object_editor.changed = function() { self.object_annotation.object = self.object_editor.val; calculateCacheState(); };
+  self.t_editor.changed      = function() { self.object_annotation.t      = self.t_editor.val;      calculateCacheState(); };
+  self.color_editor.changed  = function() { self.object_annotation.color  = self.color_editor.val;  calculateCacheState(); };
+  self.img_editor.changed    = function() { self.object_annotation.img    = self.img_editor.val;    calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
+  self.properties.push(self.object_editor);
+  self.properties.push(self.t_editor);
   self.properties.push(self.color_editor);
   self.properties.push(self.img_editor);
 
@@ -1173,22 +1299,30 @@ var group_transition_editor = function(editor)
   self.set_group_transition = function(group_transition)
   {
     self.group_transition = group_transition;
-    self.name_editor.set_val( self.group_transition.name);
-    self.color_editor.set_val(self.group_transition.color);
-    self.img_editor.set_val(  self.group_transition.img);
+    self.name_editor.set_val(      self.group_transition.name);
+    self.group_editor.set_val(     self.group_transition.group);
+    self.direction_editor.set_val( self.group_transition.direction);
+    self.t_editor.set_val(         self.group_transition.t);
+    self.transition_editor.set_val(self.group_transition.transition);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.color_editor         = new editable_color(editor);
-  self.img_editor           = new editable_img(editor);
-  self.name_editor.changed  = function() { self.group_transition.name  = self.name_editor.val;  calculateCacheState(); };
-  self.color_editor.changed = function() { self.group_transition.color = self.color_editor.val; calculateCacheState(); };
-  self.img_editor.changed   = function() { self.group_transition.img   = self.img_editor.val;   calculateCacheState(); };
+  self.name_editor       = new editable_text(editor);
+  self.group_editor      = new editable_group(editor);
+  self.direction_editor  = new editable_int(editor);
+  self.t_editor          = new editable_int(editor);
+  self.transition_editor = new editable_int(editor);
+  self.name_editor.changed       = function() { self.group_transition.name       = self.name_editor.val;       calculateCacheState(); };
+  self.group_editor.changed      = function() { self.group_transition.group      = self.group_editor.val;      calculateCacheState(); };
+  self.direction_editor.changed  = function() { self.group_transition.direction  = self.direction_editor.val;  calculateCacheState(); };
+  self.t_editor.changed          = function() { self.group_transition.t          = self.t_editor.val;          calculateCacheState(); };
+  self.transition_editor.changed = function() { self.group_transition.transition = self.transition_editor.val; calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
-  self.properties.push(self.color_editor);
-  self.properties.push(self.img_editor);
+  self.properties.push(self.group_editor);
+  self.properties.push(self.direction_editor);
+  self.properties.push(self.t_editor);
+  self.properties.push(self.transition_editor);
 
   self.hover = function(group_transition,evt)
   {
@@ -1289,22 +1423,34 @@ var object_transition_editor = function(editor)
   self.set_object_transition = function(object_transition)
   {
     self.object_transition = object_transition;
-    self.name_editor.set_val( self.object_transition.name);
-    self.color_editor.set_val(self.object_transition.color);
-    self.img_editor.set_val(  self.object_transition.img);
+    self.name_editor.set_val(      self.object_transition.name);
+    self.object_editor.set_val(    self.object_transition.object);
+    self.group_editor.set_val(     self.object_transition.group);
+    self.direction_editor.set_val( self.object_transition.direction);
+    self.t_editor.set_val(         self.object_transition.t);
+    self.transition_editor.set_val(self.object_transition.transition);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.color_editor         = new editable_color(editor);
-  self.img_editor           = new editable_img(editor);
-  self.name_editor.changed  = function() { self.object_transition.name  = self.name_editor.val;  calculateCacheState(); };
-  self.color_editor.changed = function() { self.object_transition.color = self.color_editor.val; calculateCacheState(); };
-  self.img_editor.changed   = function() { self.object_transition.img   = self.img_editor.val;   calculateCacheState(); };
+  self.name_editor       = new editable_text(editor);
+  self.object_editor     = new editable_object(editor);
+  self.group_editor      = new editable_group(editor);
+  self.direction_editor  = new editable_int(editor);
+  self.t_editor          = new editable_int(editor);
+  self.transition_editor = new editable_int(editor);
+  self.name_editor.changed       = function() { self.object_transition.name       = self.name_editor.val;       calculateCacheState(); };
+  self.object_editor.changed     = function() { self.object_transition.object     = self.object_editor.val;     calculateCacheState(); };
+  self.group_editor.changed      = function() { self.object_transition.group      = self.group_editor.val;      calculateCacheState(); };
+  self.direction_editor.changed  = function() { self.object_transition.direction  = self.direction_editor.val;  calculateCacheState(); };
+  self.t_editor.changed          = function() { self.object_transition.t          = self.t_editor.val;          calculateCacheState(); };
+  self.transition_editor.changed = function() { self.object_transition.transition = self.transition_editor.val; calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
-  self.properties.push(self.color_editor);
-  self.properties.push(self.img_editor);
+  self.properties.push(self.object_editor);
+  self.properties.push(self.group_editor);
+  self.properties.push(self.direction_editor);
+  self.properties.push(self.t_editor);
+  self.properties.push(self.transition_editor);
 
   self.hover = function(object_transition,evt)
   {
@@ -1405,22 +1551,42 @@ var camera_target_editor = function(editor)
   self.set_camera_target = function(camera_target)
   {
     self.camera_target = camera_target;
-    self.name_editor.set_val( self.camera_target.name);
-    self.color_editor.set_val(self.camera_target.color);
-    self.img_editor.set_val(  self.camera_target.img);
+    self.name_editor.set_val(      self.camera_target.name);
+    self.wx_editor.set_val(        self.camera_target.wx);
+    self.wy_editor.set_val(        self.camera_target.wy);
+    self.ww_editor.set_val(        self.camera_target.ww);
+    self.wh_editor.set_val(        self.camera_target.wh);
+    self.t_editor.set_val(         self.camera_target.t);
+    self.target_editor.set_val(    self.camera_target.target);
+    self.transition_editor.set_val(self.camera_target.transition);
   }
 
-  self.name_editor          = new editable_text(editor);
-  self.color_editor         = new editable_color(editor);
-  self.img_editor           = new editable_img(editor);
-  self.name_editor.changed  = function() { self.camera_target.name  = self.name_editor.val;  calculateCacheState(); };
-  self.color_editor.changed = function() { self.camera_target.color = self.color_editor.val; calculateCacheState(); };
-  self.img_editor.changed   = function() { self.camera_target.img   = self.img_editor.val;   calculateCacheState(); };
+  self.name_editor       = new editable_text(editor);
+  self.wx_editor         = new editable_float(editor);
+  self.wy_editor         = new editable_float(editor);
+  self.ww_editor         = new editable_float(editor);
+  self.wh_editor         = new editable_float(editor);
+  self.t_editor          = new editable_int(editor);
+  self.target_editor     = new editable_int(editor);
+  self.transition_editor = new editable_int(editor);
+  self.name_editor.changed       = function() { self.camera_target.name       = self.name_editor.val;       calculateCacheState(); };
+  self.wx_editor.changed         = function() { self.camera_target.wx         = self.wx_editor.val;         calculateCacheState(); };
+  self.wy_editor.changed         = function() { self.camera_target.wy         = self.wy_editor.val;         calculateCacheState(); };
+  self.ww_editor.changed         = function() { self.camera_target.ww         = self.ww_editor.val;         calculateCacheState(); };
+  self.wh_editor.changed         = function() { self.camera_target.wh         = self.wh_editor.val;         calculateCacheState(); };
+  self.t_editor.changed          = function() { self.camera_target.t          = self.t_editor.val;          calculateCacheState(); };
+  self.target_editor.changed     = function() { self.camera_target.target     = self.target_editor.val;     calculateCacheState(); };
+  self.transition_editor.changed = function() { self.camera_target.transition = self.transition_editor.val; calculateCacheState(); };
 
   self.properties = [];
   self.properties.push(self.name_editor);
-  self.properties.push(self.color_editor);
-  self.properties.push(self.img_editor);
+  self.properties.push(self.wx_editor);
+  self.properties.push(self.wy_editor);
+  self.properties.push(self.ww_editor);
+  self.properties.push(self.wh_editor);
+  self.properties.push(self.t_editor);
+  self.properties.push(self.target_editor);
+  self.properties.push(self.transition_editor);
 
   self.hover = function(camera_target,evt)
   {
@@ -1803,6 +1969,96 @@ var content_editor = function()
     }
   };
 
+  self.annotation_editor = new annotation_editor(self);
+  self.annotation_editor.hovered = function(i){};//ignore
+  self.annotation_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.annotation_editor.hovering_i = 0;
+      self.annotation_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
+  self.group_annotation_editor = new group_annotation_editor(self);
+  self.group_annotation_editor.hovered = function(i){};//ignore
+  self.group_annotation_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.group_annotation_editor.hovering_i = 0;
+      self.group_annotation_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
+  self.object_annotation_editor = new object_annotation_editor(self);
+  self.object_annotation_editor.hovered = function(i){};//ignore
+  self.object_annotation_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.object_annotation_editor.hovering_i = 0;
+      self.object_annotation_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
+  self.group_transition_editor = new group_transition_editor(self);
+  self.group_transition_editor.hovered = function(i){};//ignore
+  self.group_transition_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.group_transition_editor.hovering_i = 0;
+      self.group_transition_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
+  self.object_transition_editor = new object_transition_editor(self);
+  self.object_transition_editor.hovered = function(i){};//ignore
+  self.object_transition_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.object_transition_editor.hovering_i = 0;
+      self.object_transition_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
+  self.camera_target_editor = new camera_target_editor(self);
+  self.camera_target_editor.hovered = function(i){};//ignore
+  self.camera_target_editor.selected = function(i)
+  {
+    if(i == -1) //back btn
+    {
+      self.cur_selected_i = 0;
+      self.edit_mode = EDIT_MODE_ENUM_LIST;
+
+      self.camera_target_editor.hovering_i = 0;
+      self.camera_target_editor.selected_i = 0;
+      self.editable_list.hovering_i = -1;
+    }
+  };
+
   var ENUM;
 
   self.edit_type = CONTENT_ENUM_NONE;
@@ -1981,9 +2237,17 @@ var timeline_editor = function()
             }
             else if(cur_in  && gt.direction == TRANSITION_DIRECTION_ENUM_OUT)
             {
-              ctx.fillRect(lerp(self.x,self.x_self.w,in_t/(t_breadth+1)),box_y,lerp(self.x,self.x_self.w,g.t/(t_breadth+1)),self.selection_box_h);
+              var x = lerp(self.x,self.x+self.w,in_t/(t_breadth+1));
+              var w = lerp(self.x,self.x+self.w,gt.t/(t_breadth+1))-x;
+              ctx.fillRect(x,box_y,w,self.selection_box_h);
               cur_in = 0;
             }
+          }
+          if(cur_in)
+          {
+            var x = lerp(self.x,self.x+self.w,in_t/(t_breadth+1));
+            var w = self.x+self.w-x;
+            ctx.fillRect(x,box_y,w,self.selection_box_h);
           }
         }
         ctx.fillStyle = black;

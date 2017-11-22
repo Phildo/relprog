@@ -24,9 +24,13 @@ var list_for_content = function(type)
   }
 }
 
-var domain_groups_cached;
-var group_transitions_cached;
-var object_transitions_cached;
+var domain_groups_cached; //groups grouped by domain
+//missing //group_transitions sorted by t
+var group_transitions_cached; //group_transitions grouped by group, sorted by t, validated
+//missing //object_transitions sorted by t
+var object_transitions_cached; //object_transitions grouped by object, sorted by t
+//missing //object_transitions grouped by group, sorted by t
+var group_object_transitions_cached; //object_transitions grouped by group/object, sorted by t, validated
 
 //cache state
 var spacial_domain;
@@ -109,18 +113,12 @@ var calculateCacheState = function()
   }
 
   t_breadth = 0;
-  for(var i = 0; i < annotations; i++)
-    if(annotations.t > t_breadth) t_breadth = annotations.t;
-  for(var i = 0; i < group_annotations; i++)
-    if(group_annotations.t > t_breadth) t_breadth = group_annotations.t;
-  for(var i = 0; i < object_annotations; i++)
-    if(object_annotations.t > t_breadth) t_breadth = object_annotations.t;
-  for(var i = 0; i < group_transitions; i++)
-    if(group_transitions.t > t_breadth) t_breadth = group_transitions.t;
-  for(var i = 0; i < object_transitions; i++)
-    if(object_transitions.t > t_breadth) t_breadth = object_transitions.t;
-  for(var i = 0; i < camera_targets; i++)
-    if(camera_targets.t > t_breadth) t_breadth = camera_targets.t;
+  for(var i = 0; i < annotations.length;        i++) if(annotations[i].t        > t_breadth) t_breadth = annotations[i].t;
+  for(var i = 0; i < group_annotations.length;  i++) if(group_annotations[i].t  > t_breadth) t_breadth = group_annotations[i].t;
+  for(var i = 0; i < object_annotations.length; i++) if(object_annotations[i].t > t_breadth) t_breadth = object_annotations[i].t;
+  for(var i = 0; i < group_transitions.length;  i++) if(group_transitions[i].t  > t_breadth) t_breadth = group_transitions[i].t;
+  for(var i = 0; i < object_transitions.length; i++) if(object_transitions[i].t > t_breadth) t_breadth = object_transitions[i].t;
+  for(var i = 0; i < camera_targets.length;     i++) if(camera_targets[i].t     > t_breadth) t_breadth = camera_targets[i].t;
 
   spacial_x_min = 0;
   spacial_y_min = 0;
@@ -232,7 +230,9 @@ var calculateCacheState = function()
   domain_groups_cached = [];
   for(var i = 0; i < domains.length; i++)
   {
+    //structure
     domain_groups_cached[i] = [];
+    //aggregate
     for(var j = 0; j < groups.length; j++)
     {
       if(groups[j].domain == i)
@@ -243,22 +243,120 @@ var calculateCacheState = function()
   group_transitions_cached = [];
   for(var i = 0; i < groups.length; i++)
   {
+    //structure
     group_transitions_cached[i] = [];
+    //aggregate
     for(var j = 0; j < group_transitions.length; j++)
     {
       if(group_transitions[j].group == i)
         group_transitions_cached[i].push(group_transitions[j]);
+    }
+    //sort
+    for(var j = 0; j < group_transitions_cached[i].length; j++)
+    {
+      var tmp = group_transitions_cached[i][j];
+      for(var k = j+1; k < group_transitions_cached[i].length; k++)
+      {
+        if(group_transitions_cached[i][k].t < tmp.t)
+        {
+          group_transitions_cached[i][j] = group_transitions_cached[i][k];
+          group_transitions_cached[i][k] = tmp;
+          tmp = group_transitions_cached[i][j];
+        }
+      }
+    }
+    //validate
+    var cur_in = 0;
+    var last_t = -1;
+    for(var j = 0; j < group_transitions_cached[i].length; j++)
+    {
+      var gt = group_transitions_cached[i][j];
+           if(!cur_in && gt.direction == TRANSITION_DIRECTION_ENUM_OUT) gt.valid = false;
+      else if( cur_in && gt.direction == TRANSITION_DIRECTION_ENUM_IN)  gt.valid = false;
+      if(gt.t == last_t) { gt.valid = false; group_transitions_cached[i][j-1].valid = false; }
+      if(!gt.valid)
+      {
+        group_transitions_cached_valid = 0;
+        continue;
+      }
+      if(gt.direction == TRANSITION_DIRECTION_ENUM_IN)  cur_in = 1;
+      if(gt.direction == TRANSITION_DIRECTION_ENUM_OUT) cur_in = 0;
     }
   }
 
   object_transitions_cached = [];
   for(var i = 0; i < objects.length; i++)
   {
+    //structure
     object_transitions_cached[i] = [];
+    //aggregate
     for(var j = 0; j < object_transitions.length; j++)
     {
       if(object_transitions[j].object == i)
         object_transitions_cached[i].push(object_transitions[j]);
+    }
+    //sort
+    for(var j = 0; j < object_transitions_cached[i].length; j++)
+    {
+      var tmp = object_transitions_cached[i][j];
+      for(var k = j+1; k < object_transitions_cached[i].length; k++)
+      {
+        if(object_transitions_cached[i][k].t < tmp.t)
+        {
+          object_transitions_cached[i][j] = object_transitions_cached[i][k];
+          object_transitions_cached[i][k] = tmp;
+          tmp = object_transitions_cached[i][j];
+        }
+      }
+    }
+  }
+
+  group_object_transitions_cached = [];
+  for(var i = 0; i < groups.length; i++)
+  {
+    //structure
+    group_object_transitions_cached[i] = [];
+    for(var j = 0; j < objects.length; j++)
+      group_object_transitions_cached[i][j] = [];
+    for(var j = 0; j < object_transitions.length; j++)
+    {
+      //aggregate
+      for(var k = 0; k < groups.length; k++)
+      {
+        if(object_transitions[j].group == groups[k].id)
+          group_object_transitions_cached[i][k].push(object_transitions[j]);
+      }
+      //sort
+      for(var k = 0; k < group_object_transitions_cached[i][j].length; k++)
+      {
+        var tmp = group_object_transitions_cached[i][j][k];
+        for(var l = k+1; l < group_object_transitions_cached[i][j].length; l++)
+        {
+          if(group_object_transitions_cached[i][j][k].t < tmp.t)
+          {
+            group_object_transitions_cached[i][j][k] = group_object_transitions_cached[i][j][k];
+            group_object_transitions_cached[i][j][l] = tmp;
+            tmp = group_object_transitions_cached[i][j][k];
+          }
+        }
+      }
+      //validate
+      var cur_in = 0;
+      var last_t = -1;
+      for(var k = 0; k < group_object_transitions_cached[i][j].length; k++)
+      {
+        var ot = group_object_transitions_cached[i][j][k];
+             if(!cur_in && ot.direction == TRANSITION_DIRECTION_ENUM_OUT) ot.valid = false;
+        else if( cur_in && ot.direction == TRANSITION_DIRECTION_ENUM_IN)  ot.valid = false;
+        if(ot.t == last_t) { ot.valid = false; group_object_transitions_cached[i][j][k-1].valid = false; }
+        if(!ot.valid)
+        {
+          object_transitions_cached_valid = 0; //note- a general statement about object_transitions, _not_ just this grouping!
+          continue;
+        }
+        if(ot.direction == TRANSITION_DIRECTION_ENUM_IN)  cur_in = 1;
+        if(ot.direction == TRANSITION_DIRECTION_ENUM_OUT) cur_in = 0;
+      }
     }
   }
 
